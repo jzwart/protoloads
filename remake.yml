@@ -1,0 +1,26 @@
+target_default: forecasts
+
+packages:
+  - dplyr
+  - scipiper
+  - yaml
+
+file_extensions:
+  - feather
+  - ind
+
+sources:
+  - 1_data/src/nwm_subset.R
+  - 1_data/src/nwis_pull.R
+
+targets:
+
+  forecasts:
+    depends:
+      - 
+  
+  1_data/out/nwis.Rds:
+    command: pull_nwis(target_name)
+
+  1_data/out/nwm.Rds:
+    command: subset_nwm(target_name)
