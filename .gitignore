@@ -4,3 +4,5 @@
 .Ruserdata
 */out/*
 .httr-oauth
+lib/cfg/gd_config.yml
+.remake
