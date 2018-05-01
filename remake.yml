@@ -1,6 +1,7 @@
 target_default: forecasts
 
 packages:
+  - dataRetrieval
   - dplyr
   - scipiper
   - yaml
@@ -17,10 +18,11 @@ targets:
 
   forecasts:
     depends:
-      - 
-  
-  1_data/out/nwis.Rds:
+      - 1_data/out/nwis.rds
+      - 1_data/out/nwm.rds
+
+  1_data/out/nwis.rds:
     command: pull_nwis(target_name)
 
-  1_data/out/nwm.Rds:
+  1_data/out/nwm.rds:
     command: subset_nwm(target_name)
