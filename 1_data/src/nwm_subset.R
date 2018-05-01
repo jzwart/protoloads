@@ -1,3 +1,3 @@
-subset_nwm <- function (outfile) {
+subset_nwm <- function(outfile) {
   writeLines('', outfile)
 }
