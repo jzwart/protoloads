@@ -1,0 +1,14 @@
+version: 0.3.0
+name: 1_data/out/comids.yml.ind
+type: file
+hash: 108e95a3a37110f8e26a558cb9c3b1c8
+time: 2018-05-02 20:55:10 UTC
+depends:
+  1_data/out/sites.yml.ind: 33846a4a36eddc1ccb36e210430c9ff3
+  1_data/in/linked_sites.gpkg.ind: 3e59679667511a63b00f7c2f91669f25
+  lib/cfg/gd_config.yml: cf9c52868594c233f17a6f751a553018
+fixed: cf85c76847a0cccfffcd4ae8d9f1275c
+code:
+  functions:
+    lookup_comid: 807f2ac2f64d0cccc00b781fcc7fd233
+
