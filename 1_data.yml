@@ -1,4 +1,4 @@
-target_default: data
+target_default: 1_data
 
 include:
   - lib.yml
@@ -19,7 +19,7 @@ sources:
 
 targets:
 
-  data:
+  1_data:
     depends:
       - 1_data/out/nwis.rds.ind
       - 1_data/out/nwm_retro.nc.ind
