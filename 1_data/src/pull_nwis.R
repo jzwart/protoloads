@@ -1,7 +1,7 @@
 
 pull_nwis <- function(outfile, site_ids) {
 
-  dates <- yaml::yaml.load_file('1_data/cfg/dates.yml')$calibrate
+  dates <- yaml::yaml.load_file('1_data/cfg/dates.yml')$calibrate # the end date is the start of the forecast date
   pcodes <- yaml::yaml.load_file('1_data/cfg/params.yml')
 
   if(is.null(dates$end)){
