@@ -1,0 +1,24 @@
+target_default: lib
+
+packages:
+  - dplyr
+  - googledrive
+  - scipiper
+  - yaml
+
+file_extensions:
+  - feather
+  - ind
+
+targets:
+
+  lib:
+    depends:
+      - lib/cfg/gd_config.yml
+
+  lib/cfg:
+    command: dir.create(target_name, recursive=I(TRUE), showWarnings=I(FALSE))
+
+  lib/cfg/gd_config.yml:
+    depends: lib/cfg
+    command: gd_config(config_file=target_name, folder=I("1SKp2w6wib_lzEAdunq0iZlB7tQfv9Doc"))
