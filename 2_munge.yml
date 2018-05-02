@@ -1,0 +1,17 @@
+target_default: 2_munge
+
+include:
+  - 1_data.yml
+
+packages:
+
+sources:
+  - 2_munge/src/aggregate_inputs.R
+
+targets:
+
+  2_munge:
+    depends:
+      - 1_data/out/nwis.rds.ind
+
+

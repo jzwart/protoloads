@@ -1,0 +1,27 @@
+target_default: 3_forecast
+
+include:
+  - 2_munge.yml
+
+packages:
+
+sources:
+  - 3_forecast/src/subset_inputs.R
+  - 3_forecast/src/apply_rloadest.R
+
+targets:
+
+  3_forecast:
+    depends:
+      - 3_forecast/out/inputs.rds.ind
+
+  3_forecast/out/inputs.rds.ind:
+    command: subset_inputs(
+      ind_file=target_name)
+  3_forecast/out/inputs.rds:
+    command: c('3_forecast/out/inputs.rds.ind', config_file='lib/cfg/gd_config.yml')
+
+  3_forecast/out/forecast.rds.ind:
+    command: apply_rloadest(
+      output_ind=target_name,
+      input_ind='3_forecast/out/inputs.rds.ind')
