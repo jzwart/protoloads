@@ -1,0 +1,45 @@
+target_default: forecasts
+
+include:
+  - lib.yml
+
+packages:
+  - dataRetrieval
+
+file_extensions:
+  - feather
+  - ind
+
+sources:
+  - 1_data/src/choose_sites.R
+  - 1_data/src/pull_nwis.R
+
+targets:
+
+  forecasts:
+    depends:
+      - 1_data/out/sites.ym
+      - 1_data/out/nwis.rds
+      - 1_data/out/nwm.ncf
+
+  1_data/out/sites.yml.ind:
+    command: choose_sites(
+      ind_file=target_name,
+      dates_yml='1_data/cfg/dates.yml',
+      params_yml='1_data/cfg/params.yml',
+      gd_config='lib/cfg/gd_config.yml')
+  1_data/out/sites.yml:
+    command: gd_get('1_data/out/sites.yml.ind', config_file='lib/cfg/gd_config.yml')
+
+  1_data/out/nwis.rds.ind:
+    command: pull_nwis(
+      ind_file=target_name,
+      sites_yml='1_data/out/sites.yml',
+      gd_config='lib/cfg/gd_config.yml')
+  1_data/out/nwis.rds:
+    command: gd_get('1_data/out/nwis.rds.ind', config_file='lib/cfg/gd_config.yml')
+
+  1_data/out/nwm.nc.ind:
+    command: subset_nwm(target_name)
+  1_data/out/nwm.nc:
+    command: gd_get('1_data/out/nwm.nc.ind', config_file='lib/cfg/gd_config.yml')
