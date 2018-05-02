@@ -1,10 +1,11 @@
-target_default: forecasts
+target_default: data
 
 include:
   - lib.yml
 
 packages:
   - dataRetrieval
+  - ncdf4
 
 file_extensions:
   - feather
@@ -13,14 +14,20 @@ file_extensions:
 sources:
   - 1_data/src/choose_sites.R
   - 1_data/src/pull_nwis.R
+  - 1_data/src/lookup_comid.R
+  - 1_data/src/subset_nwm.R
 
 targets:
 
-  forecasts:
+  data:
     depends:
-      - 1_data/out/sites.yml
-      - 1_data/out/nwis.rds
-      - 1_data/out/nwm.nc
+      - 1_data/out/nwis.rds.ind
+      - 1_data/out/nwm_retro.nc.ind
+      - 1_data/out/nwm_med.nc.ind
+      - 1_data/out/nwm_long1.nc.ind
+      - 1_data/out/nwm_long2.nc.ind
+      - 1_data/out/nwm_long3.nc.ind
+      - 1_data/out/nwm_long4.nc.ind
 
   1_data/out/sites.yml.ind:
     command: choose_sites(
@@ -41,7 +48,70 @@ targets:
   1_data/out/nwis.rds:
     command: gd_get('1_data/out/nwis.rds.ind', config_file='lib/cfg/gd_config.yml')
 
-  1_data/out/nwm.nc.ind:
-    command: subset_nwm(target_name)
-  1_data/out/nwm.nc:
-    command: gd_get('1_data/out/nwm.nc.ind', config_file='lib/cfg/gd_config.yml')
+  1_data/in/linked_sites.gpkg.ind:
+    command: gd_confirm_posted('1_data/in/linked_sites.gpkg.ind', config_file='lib/cfg/gd_config.yml')
+  1_data/in/linked_sites.gpkg:
+    command: gd_get('1_data/in/linked_sites.gpkg.ind', config_file='lib/cfg/gd_config.yml')
+
+  1_data/out/comids.yml.ind:
+    command: lookup_comid(
+      ind_file=target_name,
+      sites_yml='1_data/out/sites.yml.ind',
+      site_lookup='1_data/in/linked_sites.gpkg.ind',
+      gd_config='lib/cfg/gd_config.yml')
+  1_data/out/comids.yml:
+    command: gd_get('1_data/out/comids.yml.ind', config_file='lib/cfg/gd_config.yml')
+
+  1_data/out/nwm_retro.nc.ind:
+    command: subset_nwm(
+      ind_file=target_name,
+      model_configuration=I('http://localhost/thredds/dodsC/nwm_retro'),
+      comids='1_data/out/comids.yml.ind',
+      gd_config='lib/cfg/gd_config.yml')
+  1_data/out/nwm_retro.nc:
+    command: gd_get('1_data/out/nwm_retro.nc.ind', config_file='lib/cfg/gd_config.yml')
+
+  1_data/out/nwm_med.nc.ind:
+    command: subset_nwm(
+      ind_file=target_name,
+      model_configuration=I('http://localhost/thredds/dodsC/medium_range'),
+      comids='1_data/out/comids.yml.ind',
+      gd_config='lib/cfg/gd_config.yml')
+  1_data/out/nwm_med.nc:
+    command: gd_get('1_data/out/nwm_med.nc.ind', config_file='lib/cfg/gd_config.yml')
+
+  1_data/out/nwm_long1.nc.ind:
+    command: subset_nwm(
+      ind_file=target_name,
+      model_configuration=I('http://localhost/thredds/dodsC/long_range_mem1'),
+      comids='1_data/out/comids.yml.ind',
+      gd_config='lib/cfg/gd_config.yml')
+  1_data/out/nwm_long1.nc:
+    command: gd_get('1_data/out/nwm_long1.nc.ind', config_file='lib/cfg/gd_config.yml')
+
+  1_data/out/nwm_long2.nc.ind:
+    command: subset_nwm(
+      ind_file=target_name,
+      model_configuration=I('http://localhost/thredds/dodsC/long_range_mem2'),
+      comids='1_data/out/comids.yml.ind',
+      gd_config='lib/cfg/gd_config.yml')
+  1_data/out/nwm_long2.nc:
+    command: gd_get('1_data/out/nwm_long2.nc.ind', config_file='lib/cfg/gd_config.yml')
+
+  1_data/out/nwm_long3.nc.ind:
+    command: subset_nwm(
+      ind_file=target_name,
+      model_configuration=I('http://localhost/thredds/dodsC/long_range_mem3'),
+      comids='1_data/out/comids.yml.ind',
+      gd_config='lib/cfg/gd_config.yml')
+  1_data/out/nwm_long3.nc:
+    command: gd_get('1_data/out/nwm_long3.nc.ind', config_file='lib/cfg/gd_config.yml')
+
+  1_data/out/nwm_long4.nc.ind:
+    command: subset_nwm(
+      ind_file=target_name,
+      model_configuration=I('http://localhost/thredds/dodsC/long_range_mem4'),
+      comids='1_data/out/comids.yml.ind',
+      gd_config='lib/cfg/gd_config.yml')
+  1_data/out/nwm_long4.nc:
+    command: gd_get('1_data/out/nwm_long4.nc.ind', config_file='lib/cfg/gd_config.yml')

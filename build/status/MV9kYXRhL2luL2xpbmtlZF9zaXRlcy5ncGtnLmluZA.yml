@@ -1,0 +1,11 @@
+version: 0.3.0
+name: 1_data/in/linked_sites.gpkg.ind
+type: file
+hash: 3e59679667511a63b00f7c2f91669f25
+time: 2018-05-02 20:38:48 UTC
+depends:
+  lib/cfg/gd_config.yml: cf9c52868594c233f17a6f751a553018
+fixed: f5b976c3c48f3f280052fe15c19259c0
+code:
+  functions: {}
+
