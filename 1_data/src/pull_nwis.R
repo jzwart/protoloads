@@ -1,17 +1,17 @@
 
-pull_nwis <- function(outfile, site_ids) {
+pull_nwis <- function(ind_file, sites_yml, dates_yml, params_yml, gd_config) {
 
-  dates <- yaml::yaml.load_file('1_data/cfg/dates.yml')$calibrate # the end date is the start of the forecast date
-  pcodes <- yaml::yaml.load_file('1_data/cfg/params.yml')
+  dates <- yaml::yaml.load_file(dates_yml)
+  pcodes <- yaml::yaml.load_file(params_yml)
+  site_ids <- yaml::yaml.load_file(sites_yml)
 
-  if(is.null(dates$end)){
-    flow <- readNWISuv(siteNumbers=site_ids, parameterCd=pcodes$flow, startDate=dates$start)
-    nitrate <- readNWISuv(siteNumbers=site_ids, parameterCd=pcodes$nitrate, startDate=dates$start)
-  }else{
-    flow <- readNWISuv(siteNumbers=site_ids, parameterCd=pcodes$flow, startDate=dates$start, endDate=dates$end)
-    nitrate <- readNWISuv(siteNumbers=site_ids, parameterCd=pcodes$nitrate, startDate=dates$start, endDate=dates$end)
-  }
+  flow <- readNWISuv(siteNumbers=site_ids, parameterCd=pcodes$flow, startDate=dates$calibrate$start, endDate=dates$forecast$start)
+  nitrate <- readNWISuv(siteNumbers=site_ids, parameterCd=pcodes$nitrate, startDate=dates$calibrate$start, endDate=dates$forecast$start)
 
   writeLines(list(flow=flow, nitrate=nitrate), outfile)
+
+  data_file <- as_data_file(ind_file)
+  writeLines(list(flow = flow, nitrate = nitrate), data_file)
+  gd_put(remote_ind = ind_file, local_source = data_file, config_file = gd_config)
 }
 
