@@ -13,6 +13,7 @@ file_extensions:
 
 sources:
   - 1_data/src/choose_sites.R
+  - 1_data/src/subset_sites.R
   - 1_data/src/pull_nwis.R
   - 1_data/src/lookup_comid.R
   - 1_data/src/subset_nwm.R
@@ -38,11 +39,21 @@ targets:
   1_data/out/sites.yml:
     command: gd_get('1_data/out/sites.yml.ind', config_file='lib/cfg/gd_config.yml')
 
+  1_data/out/sites_subset.yml.ind:
+    command: subset_sites(
+      ind_file=target_name,
+      sites_yml='1_data/out/sites.yml',
+      dates_subset_yml='1_data/cfg/dates_subset.yml',
+      params_yml='1_data/cfg/params.yml',
+      gd_config='lib/cfg/gd_config.yml')
+  1_data/out/sites_subset.yml:
+    command: gd_get('1_data/out/sites_subset.yml.ind', config_file='lib/cfg/gd_config.yml')
+
   1_data/out/nwis.rds.ind:
     command: pull_nwis(
       ind_file=target_name,
-      sites_yml='1_data/out/sites.yml',
-      dates_yml='1_data/cfg/dates.yml',
+      sites_yml='1_data/out/sites_subset.yml',
+      dates_yml='1_data/cfg/dates_subset.yml',
       params_yml='1_data/cfg/params.yml',
       gd_config='lib/cfg/gd_config.yml')
   1_data/out/nwis.rds:
