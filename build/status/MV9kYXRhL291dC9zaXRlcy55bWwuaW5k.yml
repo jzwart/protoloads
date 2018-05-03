@@ -1,8 +1,8 @@
 version: 0.3.0
 name: 1_data/out/sites.yml.ind
 type: file
-hash: 93dd98cb463df150c379f9e20339d729
-time: 2018-05-02 22:02:58 UTC
+hash: 33846a4a36eddc1ccb36e210430c9ff3
+time: 2018-05-03 21:35:05 UTC
 depends:
   1_data/cfg/dates.yml: 324324a40b6cf28557935846bb5e311b
   1_data/cfg/params.yml: 90a61f36f8a56d0e069a46e0b0379025
@@ -10,5 +10,5 @@ depends:
 fixed: 369ba5d384310cb882471bd98cec5690
 code:
   functions:
-    choose_sites: d16d94a8f0454081d7baa3da48d1557b
+    choose_sites: 8501494a8a30850e35596012141c4575
 

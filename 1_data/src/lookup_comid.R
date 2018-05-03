@@ -4,9 +4,11 @@ lookup_comid <- function(ind_file, sites_yml, site_lookup, gd_config) {
 
   sites <- yaml::yaml.load_file(sc_retrieve(sites_yml))
 
-  comids <- dplyr::filter(lookup, site_id %in% sites)$COMID
+  comids <- dplyr::filter(lookup, site_id %in% sites) %>%
+    dplyr::select(site_id, COMID) %>%
+    sf::st_set_geometry(NULL)
 
   data_file <- as_data_file(ind_file)
-  writeLines(sprintf("- '%s'", comids), data_file)
+  readr::write_tsv(comids, data_file)
   gd_put(remote_ind=ind_file, local_source=data_file, config_file=gd_config)
 }

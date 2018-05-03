@@ -58,6 +58,6 @@ choose_sites <- function(ind_file, dates_yml, params_yml, gd_config) {
     sort()
 
   data_file <- as_data_file(ind_file)
-  writeLines(sprintf("- '%s'", no3_sites), data_file)
+  readr::write_lines(sprintf("- '%s'", no3_sites), data_file)
   gd_put(remote_ind=ind_file, local_source=data_file, config_file=gd_config)
 }
