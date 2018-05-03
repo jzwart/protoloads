@@ -1,0 +1,15 @@
+version: 0.3.0
+name: 1_data/out/sites_subset.yml.ind
+type: file
+hash: 7bcadd59a3adfe577a106daf6dcb15d6
+time: 2018-05-03 17:18:18 UTC
+depends:
+  1_data/out/sites.yml: 4b17f805f75bb12a187ff3c3cb210e33
+  1_data/cfg/dates_subset.yml: c7f21b8771f30b190883cc83b2dbbe39
+  1_data/cfg/params.yml: 90a61f36f8a56d0e069a46e0b0379025
+  lib/cfg/gd_config.yml: 0086e0e1226f2658128f835707d09afd
+fixed: 551a0cfc524c735c29f59310d3ab5076
+code:
+  functions:
+    subset_sites: f1752832c1d6312910042230ac7446bf
+
