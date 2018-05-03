@@ -1,0 +1,14 @@
+version: 0.3.0
+name: 1_data/out/comids.tsv.ind
+type: file
+hash: 9c5e031ecc735c9271caa621ae8f7234
+time: 2018-05-03 21:35:13 UTC
+depends:
+  1_data/out/sites.yml.ind: 33846a4a36eddc1ccb36e210430c9ff3
+  1_data/in/linked_sites.gpkg.ind: fae2bc6ce44f9e708d468fbd79b75d97
+  lib/cfg/gd_config.yml: 0086e0e1226f2658128f835707d09afd
+fixed: 83b9f240aed9634674cd0c2d08ea84b8
+code:
+  functions:
+    lookup_comid: aaf8e584fdea8d582542bb9fd92d1a6f
+

@@ -1,8 +1,8 @@
 version: 0.3.0
 name: 1_data/out/sites.yml.ind
 type: file
-hash: f7c89c249db90fac35fde7bf4c9d8f9d
-time: 2018-05-03 20:39:04 UTC
+hash: 33846a4a36eddc1ccb36e210430c9ff3
+time: 2018-05-03 21:35:05 UTC
 depends:
   1_data/cfg/dates.yml: 324324a40b6cf28557935846bb5e311b
   1_data/cfg/params.yml: 90a61f36f8a56d0e069a46e0b0379025
