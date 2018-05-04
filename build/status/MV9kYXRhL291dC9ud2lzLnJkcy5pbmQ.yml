@@ -1,0 +1,15 @@
+version: 0.3.0
+name: 1_data/out/nwis.rds.ind
+type: file
+hash: 8b8e30f3fda6bb84ff31eca5f1290be5
+time: 2018-05-04 01:15:56 UTC
+depends:
+  1_data/out/sites_subset.yml: 026b48b09c46b14b2976b2fc97dda3c5
+  1_data/cfg/dates_subset.yml: 11071929d45737c88970367ec601803f
+  1_data/cfg/params.yml: 99b5922a100d7d7085acba2e404a9035
+  lib/cfg/gd_config.yml: cf9c52868594c233f17a6f751a553018
+fixed: 6ee3efadaef428a7d9a4bb4c86b7f45d
+code:
+  functions:
+    pull_nwis: 3ea43def70fe2f5e831c0bcfb005bca7
+
