@@ -4,7 +4,10 @@ subset_nwm <- function(ind_file, model_configuration, comids, gd_config) {
 
   nc <- nc_open(model_configuration)
 
-  keep <- nc$dim$feature_id$vals %in% yaml::yaml.load_file(sc_retrieve(comids)) %>% pull(COMID)
+  comid_list <- readr::read_delim(sc_retrieve(comids), delim = "\t") %>%
+    dplyr::pull(COMID)
+
+  keep <- nc$dim$feature_id$vals %in% comid_list
 
   new_feature_id <- nc$dim$feature_id$vals[keep]
 
