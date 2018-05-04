@@ -23,13 +23,13 @@ subset_sites <- function(ind_file, sites_yml, dates_subset_yml, params_yml, gd_c
   }) %>% bind_rows() %>% as_data_frame()
 
   no3_sites <- nitrate_data_munged %>%
-    filter(
+    dplyr::filter(
       is.na(stat_cd),
       count_nu > 300) %>%  # choosing sites over 300 grab samples
-    pull(site_no) %>%
+    dplyr::pull(site_no) %>%
     sort()
 
   data_file <- as_data_file(ind_file)
-  writeLines(sprintf("- '%s'", no3_sites), data_file)
+  readr::write_lines(sprintf("- '%s'", no3_sites), data_file)
   gd_put(remote_ind = ind_file, local_source = data_file, config_file = gd_config)
 }
