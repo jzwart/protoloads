@@ -57,8 +57,8 @@ targets:
   1_data/out/nwis.rds.ind:
     command: pull_nwis(
       ind_file=target_name,
-      sites_yml='1_data/out/sites_subset.yml',
-      dates_yml='1_data/cfg/dates_subset.yml',
+      sites_subset_yml='1_data/out/sites_subset.yml',
+      dates_subset_yml='1_data/cfg/dates_subset.yml',
       params_yml='1_data/cfg/params.yml',
       gd_config='lib/cfg/gd_config.yml')
 
