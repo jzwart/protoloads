@@ -1,4 +1,4 @@
-apply_rloadest <- function(output_ind, input_ind) {
+apply_rloadest <- function(output_rds, input_ind) {
 
   # Read the inputs from a file
   eList <- readRDS(sc_retrieve(input_ind))
@@ -27,7 +27,5 @@ apply_rloadest <- function(output_ind, input_ind) {
     mutate(site = eList$INFO$site.no)
 
   # Write the forecasts to file
-  data_file <- as_data_file(output_ind)
-  saveRDS(preds, data_file)
-  sc_indicate(output_ind, data_file=data_file)
+  saveRDS(preds, output_rds)
 }
