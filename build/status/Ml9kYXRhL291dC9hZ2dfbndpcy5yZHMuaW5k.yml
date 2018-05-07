@@ -1,0 +1,15 @@
+version: 0.3.0
+name: 2_data/out/agg_nwis.rds.ind
+type: file
+hash: 7764149e80428e3ac10b35bd33fb99ba
+time: 2018-05-07 16:37:53 UTC
+depends:
+  1_data/out/nwis.rds.ind: d14ae4a66cf12cff35d503fc22e0360b
+  2_munge.yml: f413cfc50ce2e29ebdff26840cc3ff3e
+  1_data/out/sites_subset.yml.ind: 9e2269d84cc3cad98a44328bab617021
+  lib/cfg/gd_config.yml: cf9c52868594c233f17a6f751a553018
+fixed: 8a07b175258cf2d2a6c2b7e0e4bf2840
+code:
+  functions:
+    aggregate_inputs: 34611e5b4ec4c729d9674943e40e55e3
+
