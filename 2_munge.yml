@@ -12,7 +12,6 @@ targets:
 
   2_munge:
     depends:
-      - 1_data/out/nwis.rds.ind
       - 2_munge/out/agg_nwis.rds.ind
 
   ### Targets built in 1_data.yml and now decoupled ###
