@@ -13,6 +13,7 @@ targets:
   2_munge:
     depends:
       - 1_data/out/nwis.rds.ind
+      - 2_data/out/agg_nwis.rds.ind
 
   ### Targets built in 1_data.yml and now decoupled ###
 
@@ -38,4 +39,10 @@ targets:
   1_data/out/nwm_long4.nc:
     command: gd_get('1_data/out/nwm_long4.nc.ind', config_file='lib/cfg/gd_config.yml')
 
-
+  2_data/out/agg_inputs.rds.ind:
+    command: aggregate_inputs(
+      ind_file = '2_data/out/nwis.agg.ind',
+      raw_ind_file = '1_data/out/nwis.rds.ind',
+      remake_file = '2_munge.yml',
+      sites_yml = '1_data/out/sites_subset.yml.ind',
+      dates_yml = '1_data/cfg/dates_subset.yml')
