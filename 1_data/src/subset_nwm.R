@@ -1,15 +1,15 @@
-subset_nwm <- function(ind_file, model_configuration, comids, gd_config) {
+subset_nwm <- function(ind_file, model_configuration, comids, remake_file, gd_config, gd_post = T) {
 
   out_file <- as_data_file(ind_file)
 
   nc <- nc_open(model_configuration)
 
-  comid_list <- readr::read_delim(sc_retrieve(comids), delim = "\t") %>%
+  comid_list <- readr::read_delim(sc_retrieve(comids, remake_file = remake_file), delim = "\t") %>%
     dplyr::pull(COMID)
 
   keep <- nc$dim$feature_id$vals %in% comid_list
 
-  new_feature_id <- nc$dim$feature_id$vals[keep]
+  new_feature_id <- nc$dim$feature_id$vals[keep] # comid list
 
   new_feature_id_dim <- ncdim_def(nc$dim$feature_id$name,
                                   units = "",
@@ -75,7 +75,7 @@ subset_nwm <- function(ind_file, model_configuration, comids, gd_config) {
 
   dimids <- nc$var$streamflow$dimids
 
-  site_inds <- which(keep)
+  site_inds <- which(keep) # indices into original nc file
 
   if(length(dimids) == 2) {
     streamflow <- matrix(nrow=new_nc$dim$time$len, ncol=length(site_inds))
@@ -99,7 +99,27 @@ subset_nwm <- function(ind_file, model_configuration, comids, gd_config) {
     }
   }
 
-  ncvar_put(new_nc, new_nc$var$streamflow, streamflow)
+  # need to loop through the sites because the dimensions in streamflow matrix were written incorrectly
+  for(s in 1:length(site_inds)) {
+    if(length(dimids) == 2) {
+      # Note axis order is assumed here!!!
+      ncvar_put(new_nc,
+                new_nc$var$streamflow,
+                streamflow[,s]*(1/new_nc$var$streamflow$scaleFact),  # need to multiply streamflow data by scale factor in nc var
+                start = c(s, 1),
+                count = c(1,-1))
+    } else if(length(dimids) == 3) {
+      for(r in 1:nc$dim$reference_time$len) {
+        ncvar_put(new_nc,
+                  new_nc$var$streamflow,
+                  streamflow[,s]*(1/new_nc$var$streamflow$scaleFact),  # need to multiply streamflow data by scale factor in nc var
+                  start = c(s, 1, r),
+                  count = c(1,-1, 1))
+      }
+    }
+  }
+
+  # ncvar_put(new_nc, new_nc$var$streamflow, streamflow)
 
   if("reference_time" %in% names(nc$dim)) {
     ncvar_put(new_nc, "reference_time", nc$dim$reference_time$vals)
@@ -113,5 +133,7 @@ subset_nwm <- function(ind_file, model_configuration, comids, gd_config) {
   nc_close(new_nc)
   nc_close(nc)
 
-  gd_put(remote_ind=ind_file, local_source=out_file, config_file=gd_config)
+  if(gd_post){
+    gd_put(remote_ind=ind_file, local_source=out_file, config_file=gd_config)
+  }
 }
