@@ -1,4 +1,4 @@
-apply_rloadest <- function(output_rds, input_ind) {
+apply_loadest <- function(output_rds, input_ind) {
 
   # Read the inputs from a file
   eList <- readRDS(sc_retrieve(input_ind))
