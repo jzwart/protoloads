@@ -1,5 +1,9 @@
-target_default: 1_data
+target_default: poster
 
 include:
+  - 2_munge.yml
   - 3_forecast.yml
+
+targets:
+
 
