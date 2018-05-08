@@ -10,9 +10,9 @@ packages:
   - rloadest
 
 sources:
-  - 3_forecast/src/subset_inputs.R
+  - 3_forecast/src/prep_inputs.R
   - 3_forecast/src/define_model_tasks.R
-  - 3_forecast/src/apply_rloadest.R
+  - 3_forecast/src/apply_loadest.R
   - 3_forecast/src/gather_forecasts.R
 
 targets:
