@@ -10,6 +10,7 @@ gather_forecasts <- function(ind_file, task_df, task_plan, load_model, gd_config
   }) %>%
     bind_rows()
 
+  # save and post the output, returning an indicator file
   data_file <- as_data_file(ind_file)
   saveRDS(model_outputs, data_file)
   gd_put(remote_ind = ind_file, local_source = data_file, config_file = gd_config)
