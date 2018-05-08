@@ -117,3 +117,13 @@ targets:
       model_configuration=I('http://localhost/thredds/dodsC/long_range_mem4'),
       comids='1_data/out/comids.tsv.ind',
       gd_config='lib/cfg/gd_config.yml')
+
+  pcodes:
+    command: c(sensor=I('99133'), grab1=I('00630'), grab2=I('00631'))
+
+  1_data/out/site_info.tsv.ind:
+    command: describe_sites(
+      ind_file=target_name,
+      sites_comids_ind='1_data/out/comids.tsv.ind',
+      pcodes=pcodes,
+      remake_file='1_data.yml')
