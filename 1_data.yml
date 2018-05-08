@@ -17,6 +17,7 @@ sources:
   - 1_data/src/pull_nwis.R
   - 1_data/src/lookup_comid.R
   - 1_data/src/subset_nwm.R
+  - 1_data/src/describe_sites.R
 
 targets:
 
@@ -121,9 +122,11 @@ targets:
   pcodes:
     command: c(sensor=I('99133'), grab1=I('00630'), grab2=I('00631'))
 
+  # sites_comids_ind could be comids_subset after jake's upcoming PR
   1_data/out/site_info.tsv.ind:
     command: describe_sites(
       ind_file=target_name,
       sites_comids_ind='1_data/out/comids.tsv.ind',
       pcodes=pcodes,
-      remake_file='1_data.yml')
+      remake_file='1_data.yml',
+      gd_config='lib/cfg/gd_config.yml')
