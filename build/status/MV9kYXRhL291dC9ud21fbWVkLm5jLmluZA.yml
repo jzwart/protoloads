@@ -1,13 +1,14 @@
 version: 0.3.0
 name: 1_data/out/nwm_med.nc.ind
 type: file
-hash: 3c67a4f4a96de635455a7af362fb6d9f
-time: 2018-05-04 00:56:21 UTC
+hash: 54d0feac4dbb46b1d5a376ab1cb6e72a
+time: 2018-05-09 20:14:42 UTC
 depends:
-  1_data/out/comids.tsv.ind: 9c5e031ecc735c9271caa621ae8f7234
+  1_data/out/comids.tsv.ind: 9ee4c62d9f4f7e1b3ca7dc9c32d274d9
+  1_data.yml: b287357241dd34c84113930812ca92e4
   lib/cfg/gd_config.yml: cf9c52868594c233f17a6f751a553018
 fixed: 083b8700e604fa86b8e2704bdb204f6d
 code:
   functions:
-    subset_nwm: aef4a3c17767382e435019b48591e42c
+    subset_nwm: b4959a98fb99a7e9c9ab2be91b132b33
 
