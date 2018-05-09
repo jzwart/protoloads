@@ -66,7 +66,7 @@ plan_forecasts <- function(
       sprintf('inputs_%s', task_name)
     },
     command = function(task_name, ...) {
-      task_info <- filter(rename(tasks_df, tn=task_name), tn==task_name)
+      task_info <- dplyr::filter(rename(tasks_df, tn=task_name), tn==task_name)
       psprintf(
         "prep_inputs(",
         "nwis_site=I('%s'),"=task_info$site,
@@ -81,24 +81,38 @@ plan_forecasts <- function(
     }
   )
 
-  forecast_rloadest <- scipiper::create_task_step(
-    step_name = 'forecast_rloadest',
+  forecast_loadest <- scipiper::create_task_step(
+    step_name = 'forecast_loadest',
     target_name = function(task_name, step_name, ...) {
-      file.path(folders$tmp, sprintf('preds_rloadest_%s.rds', task_name))
+      file.path(folders$tmp, sprintf('preds_loadest_%s.rds', task_name))
     },
     command = function(task_name, ...) {
-      paste(
+      psprintf(
         "apply_loadest(",
-        "ind_file=target_name,",
-        sprintf("inputs=inputs_%s)", task_name),
-        sep="\n      ")
+        "output_ind=target_name,",
+        "eList=inputs_%s,"=task_name,
+        "log_ind=I('%s/loadest_%s.rds'))"=c(folders$log, task_name))
+    }
+  )
+
+  forecast_wrtds <- scipiper::create_task_step(
+    step_name = 'forecast_wrtds',
+    target_name = function(task_name, step_name, ...) {
+      file.path(folders$tmp, sprintf('preds_wrtds_%s.rds', task_name))
+    },
+    command = function(task_name, ...) {
+      psprintf(
+        "apply_wrtds(",
+        "output_ind=target_name,",
+        "eList=inputs_%s,"=task_name,
+        "log_ind=I('%s/wrtds_%s.rds'))"=c(folders$log, task_name))
     }
   )
 
   task_plan <- scipiper::create_task_plan(
     task_names=tasks_df$task_name,
-    task_steps=list(subset, forecast_rloadest),
-    final_steps='forecast_rloadest',
+    task_steps=list(subset, forecast_loadest, forecast_wrtds),
+    final_steps=c('forecast_loadest', 'forecast_wrtds'),
     add_complete=FALSE,
     ind_dir=folders$log)
 
@@ -109,5 +123,9 @@ create_forecast_makefile <- function(makefile, task_plan, remake_file) {
     makefile=makefile, task_plan=task_plan,
     include=remake_file,
     packages=c('dplyr', 'scipiper'),
+    sources=c(
+      '3_forecast/src/prep_inputs.R',
+      '3_forecast/src/apply_loadest.R',
+      '3_forecast/src/apply_wrtds.R'),
     file_extensions=c('ind'))
 }
