@@ -119,6 +119,7 @@ subset_nwm <- function(ind_file, model_configuration, comids, remake_file, gd_co
     }
   }
 
+
   # ncvar_put(new_nc, new_nc$var$streamflow, streamflow)
 
   if("reference_time" %in% names(nc$dim)) {
