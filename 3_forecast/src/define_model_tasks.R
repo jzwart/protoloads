@@ -43,8 +43,8 @@ list_tasks <- function(sites_yml, remake_file) {
 # per state
 plan_forecasts <- function(
   tasks_df, folders,
-  nwis_inputs='2_munge/out/agg_nwis.rds.ind',
-  nwm_inputs='2_munge/out/agg_nwm.rds.ind',
+  site_info_ind, nwis_data_ind,
+  nwm_retro_ind, nwm_med_ind, nwm_long1_ind, nwm_long2_ind, nwm_long3_ind, nwm_long4_ind,
   remake_file
 ) {
 
@@ -68,12 +68,14 @@ plan_forecasts <- function(
     command = function(task_name, ...) {
       task_info <- filter(rename(tasks_df, tn=task_name), tn==task_name)
       psprintf(
-        "subset_inputs(",
-        "nwis_inputs='%s',"=nwis_inputs,
+        "prep_inputs(",
         "nwis_site=I('%s'),"=task_info$site,
-        "nwm_inputs='%s',"=nwm_inputs,
         "nwm_model=I('%s'),"=task_info$model_range,
         "ref_date=I('%s'),"=task_info$ref_date,
+        "site_info_ind='%s',"=site_info_ind,
+        "nwis_data_ind='%s',"=nwis_data_ind,
+        "nwm_retro_ind='%s',"=nwm_retro_ind,
+        "nwm_forecast_ind='%s',"=if(task_info$model_range=='med') nwm_med_ind else nwm_long1_ind,
         "remake_file='%s')"=remake_file,
         sep="\n      ")
     }
@@ -86,7 +88,7 @@ plan_forecasts <- function(
     },
     command = function(task_name, ...) {
       paste(
-        "apply_rloadest(",
+        "apply_loadest(",
         "ind_file=target_name,",
         sprintf("inputs=inputs_%s)", task_name),
         sep="\n      ")

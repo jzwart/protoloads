@@ -10,9 +10,9 @@ packages:
   - rloadest
 
 sources:
-  - 3_forecast/src/subset_inputs.R
+  - 3_forecast/src/prep_inputs.R
   - 3_forecast/src/define_model_tasks.R
-  - 3_forecast/src/apply_rloadest.R
+  - 3_forecast/src/apply_loadest.R
   - 3_forecast/src/gather_forecasts.R
 
 targets:
@@ -39,7 +39,17 @@ targets:
       remake_file='3_forecast.yml')
   forecast_plan:
     command: plan_forecasts(
-      tasks_df=forecast_df, folders=forecast_folders, remake_file='3_forecast.yml')
+      tasks_df=forecast_df,
+      folders=forecast_folders,
+      site_info_ind='1_data/out/site_info.tsv.ind',
+      nwis_data_ind='2_munge/out/agg_nwis.rds.ind',
+      nwm_retro_ind='2_munge/out/agg_nwm_retro.rds.ind',
+      nwm_med_ind  ='2_munge/out/agg_nwm_med.rds.ind',
+      nwm_long1_ind='2_munge/out/agg_nwm_long1.rds.ind',
+      nwm_long2_ind='2_munge/out/agg_nwm_long2.rds.ind',
+      nwm_long3_ind='2_munge/out/agg_nwm_long3.rds.ind',
+      nwm_long4_ind='2_munge/out/agg_nwm_long4.rds.ind',
+      remake_file='3_forecast.yml')
   3_forecast_tasks.yml:
     command: create_forecast_makefile(makefile=target_name, task_plan=forecast_plan, remake_file='3_forecast.yml')
 

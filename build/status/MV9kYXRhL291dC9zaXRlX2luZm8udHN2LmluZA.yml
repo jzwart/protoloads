@@ -1,0 +1,15 @@
+version: 0.3.0
+name: 1_data/out/site_info.tsv.ind
+type: file
+hash: cad0cf943d988c5250398bed91ff9c4c
+time: 2018-05-08 22:02:23 UTC
+depends:
+  1_data/out/comids.tsv.ind: 68bf8bd56fa67a8352caf743a2d010a5
+  pcodes: c6b6470e079f1ee798349d3d433af443
+  1_data.yml: 24745d6a66f84598243443ab9bc9c960
+  lib/cfg/gd_config.yml: cf9c52868594c233f17a6f751a553018
+fixed: 67d24a8ebbb4f0a41233bea5f5f89774
+code:
+  functions:
+    describe_sites: f0dd773deaf5a0cfbf2a6909c7050ba1
+
