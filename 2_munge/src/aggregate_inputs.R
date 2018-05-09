@@ -100,7 +100,10 @@ aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_yml, comids
   # }) %>% bind_rows() %>% as_data_frame()
 
   #fake hydrograph for now
-  date = seq(as.Date('1993-01-01'), as.Date('2018-03-01'), by = 'days')
+  date_retro = seq(as.Date('1993-01-01'), as.Date('2018-03-01'), by = 'days') # retro dates
+  date_forecast = seq(as.Date('2017-01-01'), as.Date('2018-05-01'), by = 'days') # reference dates
+  model_range = ifelse(length(grep('retro', ind_file))>0,NA, ifelse(length(grep('med', ind_file))>0, 10, 30)) # model range in days
+
   sites = yaml::yaml.load_file(sc_retrieve(sites_yml,remake_file = remake_file))
   comids_lookup = readr::read_delim(sc_retrieve(comids_file, remake_file = remake_file), delim='\t')
 
@@ -108,22 +111,26 @@ aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_yml, comids
   for(site in 1:length(sites)){
     if(length(grep('retro',ind_file))>0){
 
-      hydrograph = rgamma(length(date),shape = 1, scale = 2)
+      hydrograph = rgamma(length(date_retro),shape = 1, scale = 2)
 
-      agg_cur = data.frame(date = date,
-                           flow = rep(hydrograph, length(date)),
-                           site_no = rep(sites[site], length(date)),
-                           comid = rep(comids_lookup$COMID[comids_lookup$site_id==sites[site]], length(date)))
+      agg_cur = data.frame(date = date_retro,
+                           flow = hydrograph,
+                           site_no = rep(sites[site], length(date_retro)),
+                           comid = rep(comids_lookup$COMID[comids_lookup$site_id==sites[site]], length(date_retro)))
 
-    } else {
-      hydrograph = rgamma(length(date),shape = 1, scale = 2)
+    }else{
+      agg_cur = lapply(date_forecast, function(date){
 
-      agg_cur = data.frame(ref_date = date,
-                           valid_date = date,
-                           flow = rep(hydrograph, length(date)),
-                           site_no = rep(sites[site], length(date)),
-                           comid = rep(comids_lookup$COMID[comids_lookup$site_id==sites[site]], length(date)))
+        valid = seq(date,
+                    date + as.difftime(model_range-1, units = 'days'),
+                    by = 'days')
 
+        data.frame(ref_date = rep(date, model_range),
+                   valid_date = valid,
+                   flow = rgamma(model_range,shape = 1, scale = 2),
+                   site_no = rep(sites[site], model_range),
+                   comid = rep(comids_lookup$COMID[comids_lookup$site_id==sites[site]], model_range))
+      }) %>% bind_rows
     }
     agg_out = rbind(agg_out, agg_cur)
   }
@@ -132,3 +139,5 @@ aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_yml, comids
   saveRDS(agg_out, data_file)
   gd_put(remote_ind = ind_file, local_source = data_file, config_file = gd_config)
 }
+
+
