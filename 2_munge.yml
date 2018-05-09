@@ -49,7 +49,7 @@ targets:
     command: aggregate_nwis(
       ind_file = target_name,
       raw_ind_file = '1_data/out/nwis.rds.ind',
-      remake_file = '2_munge.yml',
+      remake_file = I('2_munge.yml'),
       sites_yml = '1_data/out/sites_subset.yml.ind',
       gd_config = 'lib/cfg/gd_config.yml')
 
@@ -57,7 +57,7 @@ targets:
     command: aggregate_nwm(
       ind_file = target_name,
       raw_ind_file = '1_data/out/nwm_retro.nc.ind',
-      remake_file = '2_munge.yml',
+      remake_file = I('2_munge.yml'),
       sites_yml = '1_data/out/sites_subset.yml.ind',
       comids_file = '1_data/out/comids_subset.tsv.ind',
       gd_config = 'lib/cfg/gd_config.yml')
@@ -66,7 +66,7 @@ targets:
     command: aggregate_nwm(
       ind_file = target_name,
       raw_ind_file = '1_data/out/nwm_med.nc.ind',
-      remake_file = '2_munge.yml',
+      remake_file = I('2_munge.yml'),
       sites_yml = '1_data/out/sites_subset.yml.ind',
       comids_file = '1_data/out/comids_subset.tsv.ind',
       gd_config = 'lib/cfg/gd_config.yml')
@@ -75,7 +75,7 @@ targets:
     command: aggregate_nwm(
       ind_file = target_name,
       raw_ind_file = '1_data/out/nwm_long1.nc.ind',
-      remake_file = '2_munge.yml',
+      remake_file = I('2_munge.yml'),
       sites_yml = '1_data/out/sites_subset.yml.ind',
       comids_file = '1_data/out/comids_subset.tsv.ind',
       gd_config = 'lib/cfg/gd_config.yml')
@@ -84,7 +84,7 @@ targets:
     command: aggregate_nwm(
       ind_file = target_name,
       raw_ind_file = '1_data/out/nwm_long2.nc.ind',
-      remake_file = '2_munge.yml',
+      remake_file = I('2_munge.yml'),
       sites_yml = '1_data/out/sites_subset.yml.ind',
       comids_file = '1_data/out/comids_subset.tsv.ind',
       gd_config = 'lib/cfg/gd_config.yml')
@@ -93,7 +93,7 @@ targets:
     command: aggregate_nwm(
       ind_file = target_name,
       raw_ind_file = '1_data/out/nwm_long3.nc.ind',
-      remake_file = '2_munge.yml',
+      remake_file = I('2_munge.yml'),
       sites_yml = '1_data/out/sites_subset.yml.ind',
       comids_file = '1_data/out/comids_subset.tsv.ind',
       gd_config = 'lib/cfg/gd_config.yml')
@@ -102,7 +102,7 @@ targets:
     command: aggregate_nwm(
       ind_file = target_name,
       raw_ind_file = '1_data/out/nwm_long4.nc.ind',
-      remake_file = '2_munge.yml',
+      remake_file = I('2_munge.yml'),
       sites_yml = '1_data/out/sites_subset.yml.ind',
       comids_file = '1_data/out/comids_subset.tsv.ind',
       gd_config = 'lib/cfg/gd_config.yml')
