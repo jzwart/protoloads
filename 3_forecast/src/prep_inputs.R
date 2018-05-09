@@ -28,7 +28,7 @@ prep_inputs <- function(
     value=rnorm(length(dateTime), 10, 2),
     code='A'
   ) %>%
-    filter(dateTime >= start_calib, dateTime < end_forecast) %>%
+    dplyr::filter(dateTime >= start_calib, dateTime < end_forecast) %>%
     EGRET::populateDaily(qConvert=q_divisor, verbose=FALSE)
   #Daily <- readNWISDaily("06934500","00060","1979-10-01","2010-09-30")
 
@@ -38,14 +38,14 @@ prep_inputs <- function(
     comment="",
     value=rnorm(length(dateTime), 50, 14)
   ) %>%
-    filter(dateTime >= start_calib, dateTime < ref_Date) %>%
+    dplyr::filter(dateTime >= start_calib, dateTime < ref_Date) %>%
     EGRET::compressData() %>%
     EGRET::populateSampleColumns()
   #Sample <-readNWISSample("06934500","00631","1970-10-01","2011-09-30")
 
   # prepare site info
   info <- site_info %>%
-    filter(site_no == nwis_site) %>%
+    dplyr::filter(site_no == nwis_site) %>%
     mutate(ref_date = ref_Date)
   # INFO <- readNWISInfo(siteNumber,pCode,interactive=FALSE)
 

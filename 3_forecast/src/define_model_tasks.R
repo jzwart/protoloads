@@ -66,7 +66,7 @@ plan_forecasts <- function(
       sprintf('inputs_%s', task_name)
     },
     command = function(task_name, ...) {
-      task_info <- filter(rename(tasks_df, tn=task_name), tn==task_name)
+      task_info <- dplyr::filter(rename(tasks_df, tn=task_name), tn==task_name)
       psprintf(
         "prep_inputs(",
         "nwis_site=I('%s'),"=task_info$site,

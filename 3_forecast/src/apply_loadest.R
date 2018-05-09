@@ -7,7 +7,7 @@ apply_loadest <- function(output_rds, eList, log_rds) {
     # Fit the 7-parameter model
     fit_data <- eList$Sample %>%
       select(Date, ConcLow, ConcHigh, Q) %>%
-      filter(Date < eList$INFO$ref_date)
+      dplyr::filter(Date < eList$INFO$ref_date)
     fit <- loadReg(
       survival::Surv(ConcLow, ConcHigh, type="interval2") ~ model(9),
       data=fit_data,
@@ -20,7 +20,7 @@ apply_loadest <- function(output_rds, eList, log_rds) {
     # Generate load forecasts
     est_data <- eList$Daily %>%
       select(Date, Q) %>%
-      filter(Date >= eList$INFO$ref_date)
+      dplyr::filter(Date >= eList$INFO$ref_date)
     preds_load <- predLoad(
       fit, newdata=est_data, by='day'
     )
@@ -32,10 +32,9 @@ apply_loadest <- function(output_rds, eList, log_rds) {
   })
   message(sprintf("Fitted and forecast from LOADEST model in %0.2f seconds", sys_time[['elapsed']]))
 
-  # Write the full model output as an augmented eList
+  # Prepare the full model output as an augmented eList
   aList <- c(eList, list(fit_data=fit_data, est_data=est_data, fit=fit, preds=preds))
-  saveRDS(aList, log_rds)
 
   # Write the forecasts to file
-  saveRDS(preds, output_rds)
+  saveRDS(aList, output_rds)
 }
