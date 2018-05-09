@@ -7,9 +7,9 @@ subset_nwm <- function(ind_file, model_configuration, comids, remake_file, gd_co
   comid_list <- readr::read_delim(sc_retrieve(comids, remake_file = remake_file), delim = "\t") %>%
     dplyr::pull(COMID)
 
-  keep <- nc$dim$feature_id$vals %in% comid_list
+  site_inds <- match(comid_list, nc$dim$feature_id$vals) # indices into original nc file
 
-  new_feature_id <- nc$dim$feature_id$vals[keep] # comid list
+  new_feature_id <- nc$dim$feature_id$vals[site_inds] # comid list
 
   new_feature_id_dim <- ncdim_def(nc$dim$feature_id$name,
                                   units = "",
@@ -75,41 +75,34 @@ subset_nwm <- function(ind_file, model_configuration, comids, remake_file, gd_co
 
   dimids <- nc$var$streamflow$dimids
 
-  site_inds <- which(keep) # indices into original nc file
-
-  if(length(dimids) == 2) {
-    streamflow <- matrix(nrow=new_nc$dim$time$len, ncol=length(site_inds))
-  } else if (length(dimids) == 3) {
-    if(!all(nc$var$streamflow$dimids == c(0,2,1))) stop("dimids now as expected")
-    streamflow <- array(dim = c(length(site_inds), nc$dim$time$len, nc$dim$reference_time$len))
-  }
-
   for(s in 1:length(site_inds)) {
     if(length(dimids) == 2) {
       # Note axis order is assumed here!!!
-      streamflow[,s] <- ncvar_get(nc, nc$var$streamflow,
-                                  start = c(site_inds[s], 1),
-                                  count = c(1, -1))
+      ncvar_put(new_nc, new_nc$var$streamflow,
+                ncvar_get(nc, nc$var$streamflow,
+                          start = c(site_inds[s], 1),
+                          count = c(1, -1), raw_datavals = TRUE),
+                start = c(s, 1), count = c(1, -1))
     } else if(length(dimids) == 3) {
       for(r in 1:nc$dim$reference_time$len) {
-        streamflow[s,,r] <- ncvar_get(nc, nc$var$streamflow,
-                                      start = c(site_inds[s], 1, r),
-                                      count = c(1, -1, 1))
+        ncvar_put(new_nc, new_nc$var$streamflow,
+                  ncvar_get(nc, nc$var$streamflow,
+                            start = c(site_inds[s], 1, r),
+                            count = c(1, -1, 1), raw_datavals = TRUE),
+                  start = c(s, 1, r),
+                  count = c(1, -1, 1))
       }
     }
   }
-
-
-  ncvar_put(new_nc, new_nc$var$streamflow, streamflow)
 
   if("reference_time" %in% names(nc$dim)) {
     ncvar_put(new_nc, "reference_time", nc$dim$reference_time$vals)
   }
 
-  ncvar_put(new_nc, new_nc$var$latitude, ncvar_get(nc, nc$var$latitude)[keep])
-  ncvar_put(new_nc, new_nc$var$longitude, ncvar_get(nc, nc$var$longitude)[keep])
+  ncvar_put(new_nc, new_nc$var$latitude, ncvar_get(nc, nc$var$latitude)[site_inds])
+  ncvar_put(new_nc, new_nc$var$longitude, ncvar_get(nc, nc$var$longitude)[site_inds])
 
-  ncvar_put(new_nc, new_nc$dim$feature_id$name, ncvar_get(nc, nc$dim$feature_id$name)[keep])
+  ncvar_put(new_nc, new_nc$dim$feature_id$name, ncvar_get(nc, nc$dim$feature_id$name)[site_inds])
 
   nc_close(new_nc)
   nc_close(nc)
