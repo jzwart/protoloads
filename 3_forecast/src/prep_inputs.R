@@ -7,7 +7,7 @@ prep_inputs <- function(
 
   # read in data
   nwis_data <- readRDS(sc_retrieve(nwis_data_ind, remake_file))
-  site_info <- readr::read_tsv(sc_retrieve(site_info_ind, remake_file))
+  site_info <- suppressMessages(readr::read_tsv(sc_retrieve(site_info_ind, remake_file)))
   nwm_retro <- readRDS(sc_retrieve(nwm_retro_ind, remake_file))
   nwm_forecast <- readRDS(sc_retrieve(nwm_forecast_ind, remake_file))
 
