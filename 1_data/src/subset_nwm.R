@@ -1,15 +1,15 @@
-subset_nwm <- function(ind_file, model_configuration, comids, gd_config) {
+subset_nwm <- function(ind_file, model_configuration, comids, remake_file, gd_config, gd_post = T) {
 
   out_file <- as_data_file(ind_file)
 
   nc <- nc_open(model_configuration)
 
-  comid_list <- readr::read_delim(sc_retrieve(comids), delim = "\t") %>%
+  comid_list <- readr::read_delim(sc_retrieve(comids, remake_file = remake_file), delim = "\t") %>%
     dplyr::pull(COMID)
 
   keep <- nc$dim$feature_id$vals %in% comid_list
 
-  new_feature_id <- nc$dim$feature_id$vals[keep]
+  new_feature_id <- nc$dim$feature_id$vals[keep] # comid list
 
   new_feature_id_dim <- ncdim_def(nc$dim$feature_id$name,
                                   units = "",
@@ -75,7 +75,7 @@ subset_nwm <- function(ind_file, model_configuration, comids, gd_config) {
 
   dimids <- nc$var$streamflow$dimids
 
-  site_inds <- which(keep)
+  site_inds <- which(keep) # indices into original nc file
 
   if(length(dimids) == 2) {
     streamflow <- matrix(nrow=new_nc$dim$time$len, ncol=length(site_inds))
@@ -99,6 +99,7 @@ subset_nwm <- function(ind_file, model_configuration, comids, gd_config) {
     }
   }
 
+
   ncvar_put(new_nc, new_nc$var$streamflow, streamflow)
 
   if("reference_time" %in% names(nc$dim)) {
@@ -113,5 +114,7 @@ subset_nwm <- function(ind_file, model_configuration, comids, gd_config) {
   nc_close(new_nc)
   nc_close(nc)
 
-  gd_put(remote_ind=ind_file, local_source=out_file, config_file=gd_config)
+  if(gd_post){
+    gd_put(remote_ind=ind_file, local_source=out_file, config_file=gd_config)
+  }
 }
