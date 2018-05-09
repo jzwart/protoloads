@@ -35,7 +35,7 @@ targets:
   # water forecast models, and time windows
   forecast_df:
     command: list_tasks(
-      sites_yml=('1_data/out/sites_subset.yml.ind'),
+      sites_yml='1_data/out/sites_subset.yml.ind',
       remake_file = I('3_forecast.yml'))
   forecast_plan:
     command: plan_forecasts(
