@@ -94,7 +94,7 @@ targets:
       ind_file=target_name,
       model_configuration=I('http://localhost/thredds/dodsC/nwm_retro'),
       comids='1_data/out/comids.tsv.ind',
-      remake_file = '1_data.yml',
+      remake_file = I('1_data.yml'),
       gd_config='lib/cfg/gd_config.yml')
 
   1_data/out/nwm_med.nc.ind:
@@ -102,7 +102,7 @@ targets:
       ind_file=target_name,
       model_configuration=I('http://localhost/thredds/dodsC/medium_range'),
       comids='1_data/out/comids.tsv.ind',
-      remake_file = '1_data.yml',
+      remake_file = I('1_data.yml'),
       gd_config='lib/cfg/gd_config.yml')
 
   1_data/out/nwm_long1.nc.ind:
@@ -110,7 +110,7 @@ targets:
       ind_file=target_name,
       model_configuration=I('http://localhost/thredds/dodsC/long_range_mem1'),
       comids='1_data/out/comids.tsv.ind',
-      remake_file = '1_data.yml',
+      remake_file = I('1_data.yml'),
       gd_config='lib/cfg/gd_config.yml')
 
   1_data/out/nwm_long2.nc.ind:
@@ -118,7 +118,7 @@ targets:
       ind_file=target_name,
       model_configuration=I('http://localhost/thredds/dodsC/long_range_mem2'),
       comids='1_data/out/comids.tsv.ind',
-      remake_file = '1_data.yml',
+      remake_file = I('1_data.yml'),
       gd_config='lib/cfg/gd_config.yml')
 
   1_data/out/nwm_long3.nc.ind:
@@ -126,7 +126,7 @@ targets:
       ind_file=target_name,
       model_configuration=I('http://localhost/thredds/dodsC/long_range_mem3'),
       comids='1_data/out/comids.tsv.ind',
-      remake_file = '1_data.yml',
+      remake_file = I('1_data.yml'),
       gd_config='lib/cfg/gd_config.yml')
 
   1_data/out/nwm_long4.nc.ind:
@@ -134,7 +134,7 @@ targets:
       ind_file=target_name,
       model_configuration=I('http://localhost/thredds/dodsC/long_range_mem4'),
       comids='1_data/out/comids.tsv.ind',
-      remake_file = '1_data.yml',
+      remake_file = I('1_data.yml'),
       gd_config='lib/cfg/gd_config.yml')
 
   1_data/out/site_info.tsv.ind:
@@ -142,5 +142,5 @@ targets:
       ind_file=target_name,
       sites_comids_ind='1_data/out/comids_subset.tsv.ind',
       params_yml='1_data/cfg/params.yml',
-      remake_file='1_data.yml',
+      remake_file = I('1_data.yml'),
       gd_config='lib/cfg/gd_config.yml')

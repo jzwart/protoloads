@@ -36,7 +36,7 @@ targets:
   forecast_df:
     command: list_tasks(
       sites_yml='1_data/out/sites_subset.yml.ind',
-      remake_file='3_forecast.yml')
+      remake_file = I('3_forecast.yml'))
   forecast_plan:
     command: plan_forecasts(
       tasks_df=forecast_df,
@@ -51,14 +51,15 @@ targets:
       nwm_long4_ind=I('2_munge/out/agg_nwm_long4.rds.ind'),
       remake_file=I('3_forecast.yml'))
   3_forecast_tasks.yml:
-    command: create_forecast_makefile(makefile=target_name, task_plan=forecast_plan, remake_file='3_forecast.yml')
+    command: create_forecast_makefile(makefile=target_name, task_plan=forecast_plan, remake_file=I('3_forecast.yml'))
 
   # run the data pulls
   task_subset:
     command: c(I("05465500_long1_20170430"), I("07144100_med_20170430"), I("07374000_long1_20170430"))
   3_forecast/log/3_forecast_tasks.ind:
     command: loop_tasks(
-      task_plan=forecast_plan, task_makefile='3_forecast_tasks.yml',
+      task_plan=forecast_plan,
+      task_makefile= I('3_forecast_tasks.yml'),
       task_names=task_subset,
       step_names=I("forecast_loadest"),
       num_tries=I(1), sleep_on_error=I(0))
