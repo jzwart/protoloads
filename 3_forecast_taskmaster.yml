@@ -6,10 +6,6 @@ include:
 packages:
   - dplyr
   - tidyr
-  - survival
-  - rloadest
-  - EGRET
-  - doParallel
 
 sources:
   - 3_forecast/src/define_model_tasks.R
