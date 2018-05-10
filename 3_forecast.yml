@@ -11,7 +11,7 @@ targets:
 
   3_forecast:
     depends:
-      - 3_forecast/out/inputs.rds.ind
+      - 3_forecast_taskmaster_all
 
   # Targets prepared in 1_data.yml
   1_data/out/sites_subset.yml:
@@ -43,9 +43,5 @@ targets:
   # to ensure that 3_forecast/log/preds_rloadest.rds.ind gets built the first time. I think/hope
   # that after it's built, the recipe for 3_forecast/log/preds_rloadest.rds will notice if the
   # contents change...but this needs some monitoring to see whether I've got it right.
-  preds_rloadest:
-    command: scmake(I('3_forecast/log/preds_rloadest.rds.ind'), remake_file='3_forecast_taskmaster.yml')
-  3_forecast/log/preds_rloadest.rds:
-    depends: preds_rloadest
-    command: gd_get('3_forecast/log/preds_rloadest.rds.ind', config_file='lib/cfg/gd_config.yml')
+  3_forecast_taskmaster_all:
     command: scmake(I('3_forecast_taskmaster'), remake_file='3_forecast_taskmaster.yml')
