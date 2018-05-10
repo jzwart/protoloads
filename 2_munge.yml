@@ -7,6 +7,7 @@ packages:
 
 sources:
   - 2_munge/src/aggregate_inputs.R
+  - 2_munge/src/convert_time.R
 
 targets:
 

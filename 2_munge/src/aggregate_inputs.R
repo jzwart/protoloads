@@ -50,52 +50,53 @@ aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_yml, comids
 
 ####### commenting out for now until nwm nc issues are sorted out; creating fake hydrographs below #####
   # aggregating NWM data to a daily scale
-  # sites = yaml::yaml.load_file(sc_retrieve(sites_yml,remake_file = remake_file))
-  #
-  # comids_lookup = readr::read_delim(sc_retrieve(comids_file, remake_file = remake_file), delim='\t')
-  #
-  # input_raw = nc_open(sc_retrieve(raw_ind_file, remake_file = remake_file))
-  #
-  # keep <- input_raw$dim$feature_id$vals %in% comids_lookup$COMID # comids
-  #
-  # dimids <- input_raw$var$streamflow$dimids
-  #
-  # site_inds <- which(keep)
-  #
-  # if(length(dimids) == 2) {
-  #   streamflow <- matrix(nrow=input_raw$dim$time$len, ncol=length(site_inds))
-  # } else if (length(dimids) == 3) {
-  #   if(!all(input_raw$var$streamflow$dimids == c(0,2,1))) stop("dimids now as expected")
-  #   streamflow <- array(dim = c(length(site_inds), input_raw$dim$time$len, input_raw$dim$reference_time$len))
-  # }
-  #
-  # for(s in 1:length(site_inds)) {
-  #   if(length(dimids) == 2) {
-  #     # Note axis order is assumed here!!!
-  #     streamflow[,s] <- ncvar_get(input_raw, input_raw$var$streamflow,
-  #                                 start = c(site_inds[s], 1),
-  #                                 count = c(1, -1))
-  #     # time <- input_raw$var$streamflow$dim[[2]]$vals # time value; minutes since 1970-01-01 00:00:00 UTC
-  #
-  #
-  #
-  #   } else if(length(dimids) == 3) {
-  #     for(r in 1:input_raw$dim$reference_time$len) {
-  #       streamflow[s,,r] <- ncvar_get(input_raw, input_raw$var$streamflow,
-  #                                     start = c(site_inds[s], 1, r),
-  #                                     count = c(1, -1, 1))
-  #     }
-  #   }
-  # }
-  # # stream flow is [site, valid time, reference time]
-  #
-  # ncvar_put(new_nc, new_nc$var$streamflow, streamflow)
-  #
-  # if("reference_time" %in% names(nc$dim)) {
-  #   ncvar_put(new_nc, "reference_time", nc$dim$reference_time$vals)
-  # }
-  #
-  #
+  sites = yaml::yaml.load_file(sc_retrieve(sites_yml,remake_file = remake_file))
+
+  comids_lookup = readr::read_delim(sc_retrieve(comids_file, remake_file = remake_file), delim='\t')
+
+  input_raw = nc_open(sc_retrieve(raw_ind_file, remake_file = remake_file))
+
+  site_inds <- match(comids_lookup$COMID, input_raw$dim$feature_id$vals) # indices into original nc file
+
+  new_feature_id <- input_raw$dim$feature_id$vals[site_inds] # comid list
+
+  dimids <- input_raw$var$streamflow$dimids
+
+  if(length(dimids) == 2) {
+    streamflow <- matrix(nrow=input_raw$dim$time$len, ncol=length(site_inds))
+  } else if (length(dimids) == 3) {
+    if(!all(input_raw$var$streamflow$dimids == c(0,2,1))) stop("dimids now as expected")
+    streamflow <- array(dim = c(length(site_inds), input_raw$dim$time$len, input_raw$dim$reference_time$len))
+  }
+
+  time <- convert_time_nc2posix(input_raw$var$streamflow$dim[[2]]) # time value converted to posix
+
+  for(s in 1:length(site_inds)) {
+    if(length(dimids) == 2) {
+      streamflow[,s] <- ncvar_get(input_raw, input_raw$var$streamflow,
+                start = c(site_inds[s], 1),
+                count = c(1, -1),
+                raw_datavals = TRUE)
+
+
+
+    } else if(length(dimids) == 3) {
+      for(r in 1:input_raw$dim$reference_time$len) {
+        streamflow[s,,r] <- ncvar_get(input_raw, input_raw$var$streamflow,
+                                      start = c(site_inds[s], 1, r),
+                                      count = c(1, -1, 1))
+      }
+    }
+  }
+  # stream flow is [site, valid time, reference time]
+
+  ncvar_put(new_nc, new_nc$var$streamflow, streamflow)
+
+  if("reference_time" %in% names(nc$dim)) {
+    ncvar_put(new_nc, "reference_time", nc$dim$reference_time$vals)
+  }
+
+
 ######
 
   # agg_nwm = lapply(sites, function(site){
