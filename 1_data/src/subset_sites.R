@@ -1,16 +1,16 @@
 
-subset_sites <- function(ind_file, sites_yml, dates_subset_yml, params_yml, gd_config){
+subset_sites <- function(ind_file, sites_yml, dates_yml, params_yml, gd_config){
   # subsetting the sites for which have longer time series of grab samples in addition to nitrate sensor data
 
-  dates <- yaml::yaml.load_file(dates_subset_yml)
+  dates <- yaml::yaml.load_file(dates_yml)
   pcodes <- yaml::yaml.load_file(params_yml)
   sites <- yaml::yaml.load_file(sites_yml)
 
   nitrate_data <- lapply(sites, function(site){
     tryCatch({whatNWISdata(siteNumber = site,
                  parameterCd = c('00630','00631'), # checking for grab nitrate data
-                 startDT = dates$calibrate$start,
-                 endDT= dates$forecast$start)
+                 startDT = dates$pull$start,
+                 endDT= dates$forecast$end)
     }, error = function(e) {
      NULL
     })
