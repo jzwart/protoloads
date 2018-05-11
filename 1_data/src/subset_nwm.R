@@ -7,7 +7,11 @@ subset_nwm <- function(ind_file, model_configuration, comids, remake_file, gd_co
   comid_list <- readr::read_delim(sc_retrieve(comids, remake_file = remake_file), delim = "\t") %>%
     dplyr::pull(COMID)
 
-  site_inds <- match(comid_list, nc$dim$feature_id$vals) # indices into original nc file
+  site_inds <- which(nc$dim$feature_id$vals %in% comid_list) # indices into original nc file
+
+  if(length(site_inds) > length(comid_list)) {
+    warning("found duplicate comids that match in the input file.")
+  }
 
   new_feature_id <- nc$dim$feature_id$vals[site_inds] # comid list
 
