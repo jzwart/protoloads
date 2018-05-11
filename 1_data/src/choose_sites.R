@@ -19,7 +19,7 @@ choose_sites <- function(ind_file, dates_yml, params_yml, gd_config) {
       dataRetrieval::whatNWISdata(
         huc=huc, siteType='ST',
         hasDataTypeCd='iv', parameterCd=c(pcodes$flow, pcodes$nitrate),
-        startDT=dates$calibrate$start, endDT=dates$forecast$end)
+        startDT=dates$pull$start, endDT=dates$forecast$end)
     }, error=function(e) {
       NULL
     })
@@ -30,25 +30,26 @@ choose_sites <- function(ind_file, dates_yml, params_yml, gd_config) {
     )
   }) %>% bind_rows() %>% as_data_frame()
 
-  # 162 sites have instantaneous values for pcode 99133, so let's use that pcode
-  # inv_munged %>%
-  #   select(site_no, parm_cd, stat_cd, count_nu) %>%
-  #   filter(site_no %in% flow_sites, is.na(stat_cd), parm_cd %in% pcodes$nitrate) %>%
-  #   group_by(parm_cd) %>%
-  #   summarize(n_sites=length(site_no), n_obs=sum(count_nu))
-
-  # identify those sites with
+  # identify those sites with flow data having sufficient extent
   flow_sites <- inv_munged %>%
-    filter(
+    dplyr::filter(
       is.na(stat_cd),
       parm_cd %in% pcodes$flow,
       as.Date(begin_date) <= as.Date(dates$calibrate$start),
       as.Date(end_date) >= as.Date(dates$forecast$end)) %>%
     pull(site_no)
 
-  # of those 162 sites, we want the sites with long time series that include the period of
+  # 103 sites have both flow data and instantaneous values for pcode 99133, so let's use that pcode
+  # inv_munged %>%
+  #   select(site_no, parm_cd, stat_cd, count_nu) %>%
+  #   dplyr::filter(site_no %in% flow_sites, is.na(stat_cd), parm_cd %in% pcodes$nitrate) %>%
+  #   group_by(parm_cd) %>%
+  #   summarize(n_sites=length(site_no), n_obs=sum(count_nu))
+
+  # of those 162 sites, we want the sites with long time series that include the
+  # period of interest for calibration/forecasting
   no3_sites <- inv_munged %>%
-    filter(
+    dplyr::filter(
       site_no %in% flow_sites,
       is.na(stat_cd),
       parm_cd=='99133',
@@ -56,6 +57,10 @@ choose_sites <- function(ind_file, dates_yml, params_yml, gd_config) {
       as.Date(end_date) >= as.Date(dates$forecast$end)) %>%
     pull(site_no) %>%
     sort()
+
+  # we could pull out 01646500 because it wasn't there the first time and maybe
+  # we don't want to force NWM rebuild yet...
+  # no3_sites <- no3_sites[no3_sites != '01646500']
 
   data_file <- as_data_file(ind_file)
   readr::write_lines(sprintf("- '%s'", no3_sites), data_file)
