@@ -7,6 +7,7 @@ packages:
 
 sources:
   - 2_munge/src/aggregate_inputs.R
+  - 2_munge/src/convert_time.R
 
 targets:
 
@@ -24,16 +25,14 @@ targets:
   # Targets declared identically 1_data.yml
   1_data/out/sites_subset.yml:
     command: gd_get('1_data/out/sites_subset.yml.ind', config_file='lib/cfg/gd_config.yml')
-  1_data/out/comids.tsv:
-    command: gd_get('1_data/out/comids.tsv.ind', config_file='lib/cfg/gd_config.yml')
-  1_data/out/site_info.tsv:
-    command: gd_get('1_data/out/site_info.tsv.ind', config_file='lib/cfg/gd_config.yml')
 
   # Targets implied but not declared in 1_data.yml
-  1_data/out/nwis.rds:
-    command: gd_get('1_data/out/nwis.rds.ind', config_file='lib/cfg/gd_config.yml')
   1_data/out/comids_subset.tsv:
     command: gd_get('1_data/out/comids_subset.tsv.ind', config_file='lib/cfg/gd_config.yml')
+  1_data/out/site_info.tsv:
+    command: gd_get('1_data/out/site_info.tsv.ind', config_file='lib/cfg/gd_config.yml')
+  1_data/out/nwis.rds:
+    command: gd_get('1_data/out/nwis.rds.ind', config_file='lib/cfg/gd_config.yml')
   1_data/out/nwm_retro.nc:
     command: gd_get('1_data/out/nwm_retro.nc.ind', config_file='lib/cfg/gd_config.yml')
   1_data/out/nwm_med.nc:
@@ -49,62 +48,62 @@ targets:
 
   2_munge/out/agg_nwis.rds.ind:
     command: aggregate_nwis(
-      ind_file = '2_munge/out/agg_nwis.rds.ind',
+      ind_file = target_name,
       raw_ind_file = '1_data/out/nwis.rds.ind',
-      remake_file = '2_munge.yml',
+      remake_file = I('2_munge.yml'),
       sites_yml = '1_data/out/sites_subset.yml.ind',
       gd_config = 'lib/cfg/gd_config.yml')
 
   2_munge/out/agg_nwm_retro.rds.ind:
     command: aggregate_nwm(
-      ind_file = '2_munge/out/agg_nwm_retro.rds.ind',
+      ind_file = target_name,
       raw_ind_file = '1_data/out/nwm_retro.nc.ind',
-      remake_file = '2_munge.yml',
+      remake_file = I('2_munge.yml'),
       sites_yml = '1_data/out/sites_subset.yml.ind',
       comids_file = '1_data/out/comids_subset.tsv.ind',
       gd_config = 'lib/cfg/gd_config.yml')
 
   2_munge/out/agg_nwm_med.rds.ind:
     command: aggregate_nwm(
-      ind_file = '2_munge/out/agg_nwm_med.rds.ind',
+      ind_file = target_name,
       raw_ind_file = '1_data/out/nwm_med.nc.ind',
-      remake_file = '2_munge.yml',
+      remake_file = I('2_munge.yml'),
       sites_yml = '1_data/out/sites_subset.yml.ind',
       comids_file = '1_data/out/comids_subset.tsv.ind',
       gd_config = 'lib/cfg/gd_config.yml')
 
   2_munge/out/agg_nwm_long1.rds.ind:
     command: aggregate_nwm(
-      ind_file = '2_munge/out/agg_nwm_long1.rds.ind',
+      ind_file = target_name,
       raw_ind_file = '1_data/out/nwm_long1.nc.ind',
-      remake_file = '2_munge.yml',
+      remake_file = I('2_munge.yml'),
       sites_yml = '1_data/out/sites_subset.yml.ind',
       comids_file = '1_data/out/comids_subset.tsv.ind',
       gd_config = 'lib/cfg/gd_config.yml')
 
   2_munge/out/agg_nwm_long2.rds.ind:
     command: aggregate_nwm(
-      ind_file = '2_munge/out/agg_nwm_long2.rds.ind',
+      ind_file = target_name,
       raw_ind_file = '1_data/out/nwm_long2.nc.ind',
-      remake_file = '2_munge.yml',
+      remake_file = I('2_munge.yml'),
       sites_yml = '1_data/out/sites_subset.yml.ind',
       comids_file = '1_data/out/comids_subset.tsv.ind',
       gd_config = 'lib/cfg/gd_config.yml')
 
   2_munge/out/agg_nwm_long3.rds.ind:
     command: aggregate_nwm(
-      ind_file = '2_munge/out/agg_nwm_long3.rds.ind',
+      ind_file = target_name,
       raw_ind_file = '1_data/out/nwm_long3.nc.ind',
-      remake_file = '2_munge.yml',
+      remake_file = I('2_munge.yml'),
       sites_yml = '1_data/out/sites_subset.yml.ind',
       comids_file = '1_data/out/comids_subset.tsv.ind',
       gd_config = 'lib/cfg/gd_config.yml')
 
   2_munge/out/agg_nwm_long4.rds.ind:
     command: aggregate_nwm(
-      ind_file = '2_munge/out/agg_nwm_long4.rds.ind',
+      ind_file = target_name,
       raw_ind_file = '1_data/out/nwm_long4.nc.ind',
-      remake_file = '2_munge.yml',
+      remake_file = I('2_munge.yml'),
       sites_yml = '1_data/out/sites_subset.yml.ind',
       comids_file = '1_data/out/comids_subset.tsv.ind',
       gd_config = 'lib/cfg/gd_config.yml')

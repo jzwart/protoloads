@@ -1,0 +1,16 @@
+version: 0.3.0
+name: 2_munge/out/agg_nwm_long2.rds.ind
+type: file
+hash: ad62197fc9420e2fb180e12f4c10fbca
+time: 2018-05-09 22:40:25 UTC
+depends:
+  1_data/out/nwm_long2.nc.ind: 9aa21c66477719b24cec14fbf934757e
+  2_munge.yml: 361b9b7e1a4fcc4b1a07432b18e23845
+  1_data/out/sites_subset.yml.ind: 9e2269d84cc3cad98a44328bab617021
+  1_data/out/comids_subset.tsv.ind: de7fa9523acb4aa0f50fb88ef03844af
+  lib/cfg/gd_config.yml: cf9c52868594c233f17a6f751a553018
+fixed: da227e1199330e7647deca16fecfe68d
+code:
+  functions:
+    aggregate_nwm: 92850b003f464d8d10e793507470965f
+

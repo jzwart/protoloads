@@ -1,7 +1,8 @@
-describe_sites <- function(ind_file, sites_comids_ind, pcodes, remake_file, gd_config) {
+describe_sites <- function(ind_file, sites_comids_ind, params_yml, remake_file, gd_config) {
 
   # read the comid-site table. don't bother filtering to the final 3 sites, just prep all 8
   comids <- readr::read_tsv(sc_retrieve(sites_comids_ind, remake_file=remake_file))
+  pcodes <- yaml::yaml.load_file(params_yml)$nitrate
 
   # function to create a single value per column - either take the 1 unique
   # value or paste the unique values together into a single character string
