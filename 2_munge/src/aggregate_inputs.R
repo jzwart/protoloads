@@ -45,16 +45,18 @@ aggregate_nwis <- function(ind_file, raw_ind_file, remake_file, sites_yml, gd_co
   gd_put(remote_ind = ind_file, local_source = data_file, config_file = gd_config)
 }
 
-aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_yml, comids_file, gd_config) {
+aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_file, gd_config) {
 
   # aggregating NWM data to a daily scale
-  sites = yaml::yaml.load_file(sc_retrieve(sites_yml,remake_file = remake_file))
-
-  comids_lookup = readr::read_delim(sc_retrieve(comids_file, remake_file = remake_file), delim='\t')
+  sites = readr::read_delim(sc_retrieve(sites_file,remake_file = remake_file), delim='\t')
 
   input_raw = nc_open(sc_retrieve(raw_ind_file, remake_file = remake_file))
 
-  site_inds <- match(comids_lookup$COMID, input_raw$dim$feature_id$vals) # indices into original nc file
+  site_inds <- which(input_raw$dim$feature_id$vals %in% sites$COMID) # indices into original nc file
+
+  #need to figure out which site_no of the duplicates are correct;
+  # looks like the second half of the all the site pulls are correct; but need to check this later if new sites are added
+  site_inds <- site_inds[4:6]
 
   new_feature_id <- input_raw$dim$feature_id$vals[site_inds] # comid list
 
@@ -86,37 +88,43 @@ aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_yml, comids
     }
   }
 
-  #need streamflow, site_no, dateTime, for retro
-  # need streamflow, site_no, refTime, validTime, for forecast
+
   if(length(grep('retro',ind_file))>0){
 
     agg_nwm <- streamflow %>%
       as.data.frame() %>%
       setNames('flow') %>%
       mutate(
-        date = rep(as.Date(time), 3),
-        site_no = rep(comids_lookup$site_id[match(input_raw$dim$feature_id$vals[site_inds],comids_lookup$COMID)], each = length(time))) %>%
+        date = rep(as.Date(time), length(input_raw$dim$feature_id$vals[site_inds])),
+        site_no = rep(sites$site_no[match(input_raw$dim$feature_id$vals[site_inds],sites$COMID)], each = length(time))) %>%
       group_by(site_no, date) %>%
       summarise(
         flow = mean(flow)) %>%
       ungroup()
 
   }else{
+    valid_time_step = ifelse(length(grep('med',ind_file))>0, 3, 6) #medium range valid_date time step is 3 hours, long range is 6 hours
 
     agg_nwm <- streamflow %>%
       as.data.frame() %>%
       setNames(ref_time) %>% # columns are ref_time
       select(contains('00:00:00')) %>% # we only want ref dates that start at midnight
       dplyr::do(with(., {
-        ref_dates = rep(as.Date(colnames(.)), each = nrow(.))
+        ref_dates = rep(as.Date(colnames(.), tz = 'UTC'), each = nrow(.))
 
         out = data.frame(
           ref_date = ref_dates,
           valid_date = rep(valid_time, length(unique(ref_dates)) * length(sites)),
           flow = as.vector(as.matrix(.)),
-          site_no = rep(rep(comids_lookup$site_id[match(input_raw$dim$feature_id$vals[site_inds],comids_lookup$COMID)],
+          site_no = rep(rep(sites$site_no[match(input_raw$dim$feature_id$vals[site_inds],sites$COMID)],
                         each = input_raw$dim$time$len), length(unique(ref_dates))))
-      })) # need to figure out what valid date vals mean; what are the time steps?
+      })) %>%
+      mutate(valid_date = as.character(as.POSIXlt(ref_date) + as.difftime(valid_date * valid_time_step, units = 'hours'))) %>%
+      mutate(valid_date = as.Date(valid_date)) %>%
+      group_by(ref_date, valid_date, site_no) %>%
+      summarise(
+        flow = mean(flow)) %>%
+      ungroup()
   }
 
   data_file <- as_data_file(ind_file)
