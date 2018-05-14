@@ -5,6 +5,7 @@ packages:
   - googledrive
   - scipiper
   - yaml
+  - ncdf4
 
 file_extensions:
   - feather
