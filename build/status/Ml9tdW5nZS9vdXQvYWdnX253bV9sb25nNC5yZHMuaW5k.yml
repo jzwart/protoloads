@@ -2,7 +2,7 @@ version: 0.3.0
 name: 2_munge/out/agg_nwm_long4.rds.ind
 type: file
 hash: 11b3b04dc24b12b17582b415c702f880
-time: 2018-05-14 15:34:07 UTC
+time: 2018-05-14 20:32:13 UTC
 depends:
   1_data/out/nwm_long4.nc.ind: e0628028d975f9efc7644d9233c3c482
   1_data/out/site_info.tsv.ind: 021128d5fb039bd75966574f9ca7c78d
@@ -10,6 +10,6 @@ depends:
 fixed: 349df87c2b0b70117827578d83181481
 code:
   functions:
-    aggregate_nwm: 9955c339ee13a880f5d908957b58715f
+    aggregate_nwm: f888e66aba267c5a5200f17ec8394044
     convert_time_nc2posix: 2145150bf2957183d3faba19a07b647d
 

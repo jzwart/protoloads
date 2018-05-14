@@ -119,8 +119,7 @@ aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_file, gd_co
           site_no = rep(rep(sites$site_no[match(input_raw$dim$feature_id$vals[site_inds],sites$COMID)],
                         each = input_raw$dim$time$len), length(unique(ref_dates))))
       })) %>%
-      mutate(valid_date = as.character(as.POSIXlt(ref_date) + as.difftime(valid_date * valid_time_step, units = 'hours'))) %>%
-      mutate(valid_date = as.Date(valid_date)) %>%
+      mutate(valid_date = as.Date(as.POSIXlt(ref_date) + as.difftime(valid_date * valid_time_step, units = 'hours'))) %>%
       group_by(ref_date, valid_date, site_no) %>%
       summarise(
         flow = mean(flow)) %>%
