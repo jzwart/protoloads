@@ -10,7 +10,7 @@ aggregate_nwis <- function(ind_file, raw_ind_file, remake_file, sites_yml, gd_co
     mutate(date = as.Date(dateTime)) %>%
     group_by(site_no, date, parm_cd) %>%
     summarise(
-      daily_mean = mean(result_va),
+      daily_mean = mean(result_va) * 0.02831685, # convert to m^3 s^-1
       daily_cd = ifelse('<' %in% remark_cd, '<', '')) %>%
     ungroup() %>%
     mutate(tz_cd = 'UTC') %>%
