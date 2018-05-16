@@ -22,6 +22,16 @@ targets:
 
   ### Targets built in 1_data.yml and now decoupled ###
 
+  1_data_out:
+    depends:
+      - 1_data/out/site_info.tsv
+      - 1_data/out/nwis.rds
+      - 1_data/out/nwm_retro.nc
+      - 1_data/out/nwm_med.nc
+      - 1_data/out/nwm_long1.nc
+      - 1_data/out/nwm_long2.nc
+      - 1_data/out/nwm_long3.nc
+      - 1_data/out/nwm_long4.nc
 
   # Targets implied but not declared in 1_data.yml
   1_data/out/site_info.tsv:
