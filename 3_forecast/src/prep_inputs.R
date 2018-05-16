@@ -55,6 +55,12 @@ prep_inputs <- function(
     arrange(dateTime) %>%
     EGRET::populateDaily(qConvert=q_divisor, verbose=FALSE)
   #Daily <- readNWISDaily("06934500","00060","1979-10-01","2010-09-30")
+  if(any(is.na(flow$Q)) || any(is.na(flow$LogQ))) {
+    message(sprintf(
+      'Found %d NA values in Q and %d NA values in logQ; removing all corresponding rows',
+      length(which(is.na(flow$Q))), length(which(is.na(flow$LogQ)))))
+    flow <- dplyr::filter(flow, !is.na(Q), !is.na(LogQ))
+  }
 
   # prepare concentrations (only observations before ref_Date)
   conc <- bind_rows(
