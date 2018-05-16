@@ -22,18 +22,33 @@ prep_inputs <- function(
   forecast_range <- as.integer(ifelse(nwm_model=='med', 10, 30))
   end_forecast <- ref_Date + as.difftime(forecast_range-1, units='days')
 
+  # ultimately we'd like to use the analysis data for some gap between retro and
+  # forecast flow predictions, but for now we have (1) no analysis data
+  # available yet and (2) the retro ends 12/31/2017, so for later models there
+  # are NAs if we only use retro plus a single reference date. SO: for now we'll
+  # create a substitude "analysis" dataset made of lag-0 "forecasts" from
+  # previous reference days. we'll make this analysis dataset cover the period
+  # from 6 months before the reference date up until the reference date.
+  start_analysis <- ref_Date - as.difftime(182, units='days')
+  nwm_analysis <- nwm_forecast %>%
+    filter(ref_date == valid_date)
+
   ## prepare the inputs for an EGRET eList ##
 
   # prepare flow (all days from start_calib to end_forecast, for both fitting and prediction)
   q_divisor <- 1 # would be 35.3147 if NWM flow were in ft3/s because need to convert to m3/s
   flow_past <- nwm_retro %>%
-    dplyr::filter(date >= start_calib, date < ref_Date) %>%
+    dplyr::filter(date >= start_calib, date < start_analysis) %>%
     select(dateTime=date, value=flow)
+  flow_analysis <- nwm_analysis %>%
+    dplyr::filter(valid_date >= start_analysis, valid_date < ref_Date) %>%
+    select(dateTime=valid_date, value=flow)
   flow_future <- nwm_forecast %>%
     dplyr::filter(ref_date == ref_Date) %>%
     select(dateTime=valid_date, value=flow)
   flow <- bind_rows(
     flow_past,
+    flow_analysis,
     flow_future
   ) %>%
     mutate(code='') %>%
