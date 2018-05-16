@@ -15,7 +15,7 @@ apply_loadest <- function(output_rds, eList) {
       dates="Date",
       conc.units=units_lookup[eList$INFO$param.units],
       flow.units='cms',
-      station=eList$INFO$site.no)
+      station=eList$INFO$site_no)
 
     # Generate load forecasts
     est_data <- eList$Daily %>%
