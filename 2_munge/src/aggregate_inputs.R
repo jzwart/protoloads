@@ -45,13 +45,14 @@ aggregate_nwis <- function(ind_file, raw_ind_file, remake_file, sites_file, gd_c
   gd_put(remote_ind = ind_file, local_source = data_file, config_file = gd_config)
 }
 
+# read NWM data from nc files and aggregate to daily means
 aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_file, gd_config) {
 
-  # aggregating NWM data to a daily scale
-  sites = readr::read_delim(sc_retrieve(sites_file,remake_file = remake_file), delim='\t')
+  # read data files
+  sites <- readr::read_tsv(sc_retrieve(sites_file, remake_file = remake_file))
+  input_raw <- nc_open(sc_retrieve(raw_ind_file, remake_file = remake_file))
 
-  input_raw = nc_open(sc_retrieve(raw_ind_file, remake_file = remake_file))
-
+  # pick out site indices and identifiers
   site_inds <- which(input_raw$dim$feature_id$vals %in% sites$COMID) # indices into original nc file
 
   #need to figure out which site_no of the duplicates are correct;
@@ -60,49 +61,60 @@ aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_file, gd_co
 
   new_feature_id <- input_raw$dim$feature_id$vals[site_inds] # comid list
 
+  # decide what sort of file we're working with (retro or forecast)
   dimids <- input_raw$var$streamflow$dimids
+  is_retro <- length(dimids) == 2 # or length(grep('retro',ind_file))>0
+  is_forecast <- length(dimids) == 3
 
-  if(length(dimids) == 2) {
+  # create a matrix and dimension names appropriate to the format for this analysis/forecast dataset
+  if(is_retro) {
     streamflow <- matrix(nrow=input_raw$dim$time$len*length(site_inds), ncol=1)
     time <- convert_time_nc2posix(input_raw$var$streamflow$dim[[2]]) # time value converted to posix
-  } else if (length(dimids) == 3) {
+  } else if (is_forecast) {
     streamflow <- matrix(nrow = length(site_inds) * input_raw$dim$time$len, ncol = input_raw$dim$reference_time$len)
     valid_time <- input_raw$var$streamflow$dim[[2]]$vals
     ref_time <- convert_time_nc2posix(input_raw$var$streamflow$dim[[3]]) # ref time value converted to posix
   }
 
+  # populate the matrix by extracting values from the nc file
   for(s in 1:length(site_inds)) {
-    if(length(dimids) == 2) {
-      streamflow[((s-1)*length(time)+1):((s)*length(time)),1] <- ncvar_get(input_raw, input_raw$var$streamflow,
-                start = c(site_inds[s], 1),
-                count = c(1, -1),
-                raw_datavals = TRUE)
+    if(is_retro) {
+      streamflow[((s-1)*length(time)+1):((s)*length(time)),1] <-
+        ncvar_get(
+          input_raw, input_raw$var$streamflow,
+          start = c(site_inds[s], 1),
+          count = c(1, -1),
+          raw_datavals = TRUE)
 
-    } else if(length(dimids) == 3) {
+    } else if(is_forecast) {
       for(r in 1:input_raw$dim$reference_time$len) {
-        streamflow[((s-1)*length(valid_time)+1):((s)*length(valid_time)),r] <- ncvar_get(input_raw, input_raw$var$streamflow,
-                                                                             start = c(site_inds[s], 1, r),
-                                                                             count = c(1, -1, 1),
-                                                                             raw_datavals = TRUE)
+        streamflow[((s-1)*length(valid_time)+1):((s)*length(valid_time)),r] <-
+          ncvar_get(
+            input_raw, input_raw$var$streamflow,
+            start = c(site_inds[s], 1, r),
+            count = c(1, -1, 1),
+            raw_datavals = TRUE)
       }
     }
   }
 
-
-  if(length(grep('retro',ind_file))>0){
-
+  # convert the matrix into a long-form data_frame and aggregate to daily means
+  site_nos = sites$site_no[match(input_raw$dim$feature_id$vals[site_inds],sites$COMID)]
+  n_sites = length(site_nos)
+  if(is_retro){
+    n_times <- length(time)
     agg_nwm <- streamflow %>%
       as.data.frame() %>%
       setNames('flow') %>%
       mutate(
         date = rep(as.Date(time), length(input_raw$dim$feature_id$vals[site_inds])),
-        site_no = rep(sites$site_no[match(input_raw$dim$feature_id$vals[site_inds],sites$COMID)], each = length(time))) %>%
+        site_no = rep(site_nos, each = n_times)) %>%
       group_by(site_no, date) %>%
       summarise(
         flow = mean(flow)) %>%
       ungroup()
 
-  }else{
+  }else if(is_forecast){
     valid_time_step = ifelse(length(grep('med',ind_file))>0, 3, 6) #medium range valid_date time step is 3 hours, long range is 6 hours
 
     agg_nwm <- streamflow %>%
@@ -111,13 +123,14 @@ aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_file, gd_co
       select(contains('00:00:00')) %>% # we only want ref dates that start at midnight
       dplyr::do(with(., {
         ref_dates = rep(as.Date(colnames(.), tz = 'UTC'), each = nrow(.))
+        n_ref_dates = length(unique(ref_dates))
+        n_valid_times = input_raw$dim$time$len
 
-        out = data.frame(
+        out = data_frame(
           ref_date = ref_dates,
           valid_date = rep(valid_time, length(unique(ref_dates)) * length(sites)),
           flow = as.vector(as.matrix(.)),
-          site_no = rep(rep(sites$site_no[match(input_raw$dim$feature_id$vals[site_inds],sites$COMID)],
-                        each = input_raw$dim$time$len), length(unique(ref_dates))))
+          site_no = rep(rep(site_nos, each = n_valid_times), times=n_ref_dates))
       })) %>%
       mutate(valid_date = as.Date(as.POSIXlt(ref_date) + as.difftime(valid_date * valid_time_step, units = 'hours'))) %>%
       group_by(ref_date, valid_date, site_no) %>%
