@@ -107,7 +107,8 @@ aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_file, gd_co
       as.data.frame() %>%
       setNames('flow') %>%
       mutate(
-        date = rep(as.Date(time), length(input_raw$dim$feature_id$vals[site_inds])),
+        time = rep(time, n_sites),
+        date = as.Date(time - as.difftime(1/60, units = 'hours')), # use 1am to 12am to be more similar to med & long forecast daily means
         site_no = rep(site_nos, each = n_times)) %>%
       group_by(site_no, date) %>%
       summarise(
@@ -132,7 +133,9 @@ aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_file, gd_co
           flow = as.vector(as.matrix(.)),
           site_no = rep(rep(site_nos, each = n_valid_times), times=n_ref_dates))
       })) %>%
-      mutate(valid_date = as.Date(as.POSIXlt(ref_date) + as.difftime(valid_date * valid_time_step, units = 'hours'))) %>%
+      mutate(
+        valid_time = as.POSIXlt(ref_date) + as.difftime(valid_time_hrs * valid_time_step, units = 'hours'),
+        valid_date = as.Date(valid_time - as.difftime(1/60, units = 'hours'))) %>%
       group_by(ref_date, valid_date, site_no) %>%
       summarise(
         flow = mean(flow)) %>%
