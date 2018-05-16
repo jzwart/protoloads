@@ -128,7 +128,7 @@ aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_file, gd_co
 
         out = data_frame(
           ref_date = ref_dates,
-          valid_date = rep(valid_time, length(unique(ref_dates)) * length(sites)),
+          valid_time_hrs = rep(valid_time, n_ref_dates * n_sites),
           flow = as.vector(as.matrix(.)),
           site_no = rep(rep(site_nos, each = n_valid_times), times=n_ref_dates))
       })) %>%
