@@ -24,8 +24,6 @@ targets:
 
 
   # Targets implied but not declared in 1_data.yml
-  1_data/out/comids_subset.tsv:
-    command: gd_get('1_data/out/comids_subset.tsv.ind', config_file='lib/cfg/gd_config.yml')
   1_data/out/site_info.tsv:
     command: gd_get('1_data/out/site_info.tsv.ind', config_file='lib/cfg/gd_config.yml')
   1_data/out/nwis.rds:
