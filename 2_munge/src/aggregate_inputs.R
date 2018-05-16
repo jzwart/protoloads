@@ -112,7 +112,8 @@ aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_file, gd_co
         site_no = rep(site_nos, each = n_times)) %>%
       group_by(site_no, date) %>%
       summarise(
-        flow = mean(flow)) %>%
+        n = length(flow),
+        flow = if(n==24) mean(flow) else NA) %>%
       ungroup()
 
   }else if(is_forecast){
@@ -138,7 +139,8 @@ aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_file, gd_co
         valid_date = as.Date(valid_time - as.difftime(1/60, units = 'hours'))) %>%
       group_by(ref_date, valid_date, site_no) %>%
       summarise(
-        flow = mean(flow)) %>%
+        n = length(flow),
+        flow = if(n==24/valid_time_step) mean(flow) else NA) %>%
       ungroup()
   }
 
