@@ -22,9 +22,6 @@ targets:
 
   ### Targets built in 1_data.yml and now decoupled ###
 
-  # Targets declared identically 1_data.yml
-  1_data/out/sites_subset.yml:
-    command: gd_get('1_data/out/sites_subset.yml.ind', config_file='lib/cfg/gd_config.yml')
 
   # Targets implied but not declared in 1_data.yml
   1_data/out/comids_subset.tsv:
@@ -51,7 +48,7 @@ targets:
       ind_file = target_name,
       raw_ind_file = '1_data/out/nwis.rds.ind',
       remake_file = I('2_munge.yml'),
-      sites_yml = '1_data/out/sites_subset.yml.ind',
+      sites_file = '1_data/out/site_info.tsv.ind',
       gd_config = 'lib/cfg/gd_config.yml')
 
   2_munge/out/agg_nwm_retro.rds.ind:

@@ -1,9 +1,9 @@
-aggregate_nwis <- function(ind_file, raw_ind_file, remake_file, sites_yml, gd_config) {
+# aggregate NWIS data to a daily scale
+aggregate_nwis <- function(ind_file, raw_ind_file, remake_file, sites_file, gd_config) {
 
-  # aggregating NWIS data to a daily scale
-  sites = yaml::yaml.load_file(sc_retrieve(sites_yml,remake_file = remake_file))
-
-  input_raw = readRDS(sc_retrieve(raw_ind_file, remake_file = remake_file))
+  # read in data files
+  sites <- readr::read_tsv(sc_retrieve(sites_file, remake_file = remake_file))$site_no
+  input_raw <- readRDS(sc_retrieve(raw_ind_file, remake_file = remake_file))
 
   agg_flow <- input_raw$flow %>%
     dplyr::filter(site_no %in% sites) %>% # stats package overrides dplyr filter()
