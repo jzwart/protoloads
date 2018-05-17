@@ -38,7 +38,7 @@ prep_inputs <- function(
   ) %>%
     mutate(code='') %>%
     arrange(dateTime) %>%
-    EGRET::populateDaily(qConvert=q_divisor, interactive = FALSE)
+    EGRET::populateDaily(qConvert=q_divisor, verbose = FALSE)
   #Daily <- readNWISDaily("06934500","00060","1979-10-01","2010-09-30")
 
   # prepare concentrations (only observations before ref_Date)
@@ -67,7 +67,7 @@ prep_inputs <- function(
     ) %>%
     select(dateTime=date, comment, value) %>% # comment must precede value
     dplyr::filter(dateTime >= start_calib, dateTime < ref_Date) %>%
-    EGRET::compressData(interactive = FALSE) %>%
+    EGRET::compressData(verbose = FALSE) %>%
     EGRET::populateSampleColumns()
   #Sample <-readNWISSample("06934500","00631","1970-10-01","2011-09-30")
 
@@ -78,7 +78,7 @@ prep_inputs <- function(
   # INFO <- readNWISInfo(siteNumber,pCode,interactive=FALSE)
 
   # combine the inputs into an EGRET list
-  eList <- EGRET::mergeReport(INFO=info, Daily=flow, Sample=conc, interactive = FALSE)
+  eList <- EGRET::mergeReport(INFO=info, Daily=flow, Sample=conc, verbose = FALSE)
 
   return(eList)
 }
