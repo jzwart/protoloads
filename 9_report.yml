@@ -41,7 +41,7 @@ targets:
     command: gd_get('9_report/out/fig_preds_v_time.png.ind', config_file='lib/cfg/gd_config.yml')
 
   9_report/out/fig_input_data.png.ind:
-    command: fig_preds_v_time(
+    command: fig_input_data(
       fig_ind=target_name,
       preds_ind='3_forecast/out/preds_loadest.rds.ind',
       remake_file='9_report.yml',
