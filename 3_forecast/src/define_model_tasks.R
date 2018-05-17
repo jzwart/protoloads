@@ -48,8 +48,7 @@ list_tasks <- function(site_info_ind, dates_yml, nwm_med_ind, nwm_long1_ind, rem
 }
 
 
-# prepare a plan for downloading (from WQP) and posting (to GD) one data file
-# per state
+
 plan_forecasts <- function(
   tasks_df, folders,
   site_info_ind, nwis_data_ind,
