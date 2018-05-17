@@ -53,3 +53,8 @@ targets:
   # contents change...but this needs some monitoring to see whether I've got it right.
   3_forecast_taskmaster_all:
     command: scmake(I('3_forecast_taskmaster'), remake_file='3_forecast_taskmaster.yml')
+
+  3_forecast/out/preds_wrtds.rds:
+    command: gd_get('3_forecast/out/preds_wrtds.rds.ind', config_file='lib/cfg/gd_config.yml')
+  3_forecast/out/preds_loadest.rds:
+    command: gd_get('3_forecast/out/preds_loadest.rds.ind', config_file='lib/cfg/gd_config.yml')
