@@ -18,7 +18,6 @@ targets:
       - 3_forecast/log/3_forecast_tasks.ind
       - 3_forecast/out/preds_loadest.rds.ind
       - 3_forecast/out/preds_wrtds.rds.ind
-    command: sc_indicate(target_name)
 
   # prepare destination folders for intermediate output.
   # out folder should already be created & git commited.
