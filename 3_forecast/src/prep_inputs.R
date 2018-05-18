@@ -57,7 +57,7 @@ prep_inputs <- function(
   ) %>%
     mutate(code='') %>%
     arrange(dateTime) %>%
-    EGRET::populateDaily(qConvert=q_divisor, verbose=FALSE)
+    EGRET::populateDaily(qConvert=q_divisor, verbose = FALSE)
   #Daily <- readNWISDaily("06934500","00060","1979-10-01","2010-09-30")
   if(any(is.na(flow$Q)) || any(is.na(flow$LogQ))) {
     message(sprintf(
@@ -92,7 +92,7 @@ prep_inputs <- function(
     ) %>%
     select(dateTime=date, comment, value) %>% # comment must precede value
     dplyr::filter(dateTime >= start_calib, dateTime < ref_Date) %>%
-    EGRET::compressData(verbose=FALSE) %>%
+    EGRET::compressData(verbose = FALSE) %>%
     EGRET::populateSampleColumns()
   #Sample <-readNWISSample("06934500","00631","1970-10-01","2011-09-30")
 

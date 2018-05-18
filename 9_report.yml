@@ -10,12 +10,15 @@ packages:
 
 sources:
   - 9_report/src/fig_preds_v_time.R
+  - 9_report/src/fig_input_data.R
+  - 3_forecast/src/prep_inputs.R
 
 targets:
 
   9_report:
     depends:
       - 9_report/out/fig_preds_v_time.png
+      - 9_report/out/fig_input_data.png
 
   # Targets prepared in earlier steps and yml files
   1_data/out/site_info.tsv:
@@ -36,3 +39,13 @@ targets:
       config_file='lib/cfg/gd_config.yml')
   9_report/out/fig_preds_v_time.png:
     command: gd_get('9_report/out/fig_preds_v_time.png.ind', config_file='lib/cfg/gd_config.yml')
+
+  9_report/out/fig_input_data.png.ind:
+    command: fig_input_data(
+      fig_ind=target_name,
+      input_example_yml = '9_report/cfg/input_data_example.yml',
+      preds_ind='3_forecast/out/preds_loadest.rds.ind',
+      remake_file='9_report.yml',
+      config_file='lib/cfg/gd_config.yml')
+  9_report/out/fig_input_data.png:
+    command: gd_get('9_report/out/fig_input_data.png.ind', config_file='lib/cfg/gd_config.yml')
