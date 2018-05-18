@@ -19,6 +19,7 @@ prep_inputs <- function(
   ref_Date <- as.Date(ref_date)
   calib_ndays <- as.integer(365.25*5) # 5 years
   start_calib <- ref_Date - as.difftime(calib_ndays, units='days')
+  start_analysis <- ref_Date - as.difftime(182, units='days')
   forecast_range <- as.integer(ifelse(nwm_model=='med', 10, 30))
   end_forecast <- ref_Date + as.difftime(forecast_range-1, units='days')
 
@@ -28,10 +29,13 @@ prep_inputs <- function(
   # are NAs if we only use retro plus a single reference date. SO: for now we'll
   # create a substitude "analysis" dataset made of lag-0 "forecasts" from
   # previous reference days. we'll make this analysis dataset cover the period
-  # from 6 months before the reference date up until the reference date.
-  start_analysis <- ref_Date - as.difftime(182, units='days')
-  nwm_analysis <- nwm_forecast %>%
-    filter(ref_date == valid_date)
+  # from 6 months before the reference date up until the reference date (defined
+  # in start_analysis above). But we don't have this "analysis" data between
+  # 2016-11-08 and 2017-05-08, we we'll need to use the retro data for that
+  # period for this "analysis" substitute
+  nwm_analysis <- bind_rows(
+    nwm_retro %>% filter(date >= as.Date('2016-11-08'), date < min(nwm_forecast$valid_date)),
+    nwm_forecast %>% filter(ref_date == valid_date) %>% select(site_no, date = valid_date, flow))
 
   ## prepare the inputs for an EGRET eList ##
 
@@ -41,8 +45,8 @@ prep_inputs <- function(
     dplyr::filter(date >= start_calib, date < start_analysis) %>%
     select(dateTime=date, value=flow)
   flow_analysis <- nwm_analysis %>%
-    dplyr::filter(valid_date >= start_analysis, valid_date < ref_Date) %>%
-    select(dateTime=valid_date, value=flow)
+    dplyr::filter(date >= start_analysis, date < ref_Date) %>%
+    select(dateTime=date, value=flow)
   flow_future <- nwm_forecast %>%
     dplyr::filter(ref_date == ref_Date) %>%
     select(dateTime=valid_date, value=flow)
@@ -98,7 +102,17 @@ prep_inputs <- function(
     mutate(ref_date = ref_Date)
   # INFO <- readNWISInfo(siteNumber,pCode,interactive=FALSE)
 
-  # combine the inputs into an EGRET list
+  # combine the inputs into an EGRET list, first running a check & filter to
+  # make sure the merge will go smoothly
+  flow_conc <- left_join(conc, flow, by='Date')
+  if(any(is.na(flow_conc$Q))) {
+    noQ_dates <- filter(flow_conc, is.na(Q))$Date
+    message(sprintf(
+      'Found %d NA values in Q after merging flow and conc; removing those samples',
+      length(noQ_dates)))
+    message(sprintf('Bad dates: %s', paste(noQ_dates, collapse=', ')))
+    conc <- dplyr::filter(conc, !(Date %in% noQ_dates))
+  }
   eList <- EGRET::mergeReport(INFO=info, Daily=flow, Sample=conc, verbose=FALSE)
 
   return(eList)
