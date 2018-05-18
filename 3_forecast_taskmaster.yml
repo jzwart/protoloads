@@ -74,7 +74,7 @@ targets:
 
   # gather the data pulls
   3_forecast/out/preds_loadest.rds.ind:
-    #depends: 3_forecast/log/3_forecast_tasks.ind
+    depends: 3_forecast/log/3_forecast_tasks.ind
     command: gather_forecasts(
       ind_file=target_name,
       task_df=forecast_df,
@@ -83,7 +83,7 @@ targets:
       gd_config='lib/cfg/gd_config.yml')
 
   3_forecast/out/preds_wrtds.rds.ind:
-    #depends: 3_forecast/log/3_forecast_tasks.ind
+    depends: 3_forecast/log/3_forecast_tasks.ind
     command: gather_forecasts(
       ind_file=target_name,
       task_df=forecast_df,
