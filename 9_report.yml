@@ -43,6 +43,7 @@ targets:
   9_report/out/fig_input_data.png.ind:
     command: fig_input_data(
       fig_ind=target_name,
+      input_example_yml = '9_report/cfg/input_data_example.yml',
       preds_ind='3_forecast/out/preds_loadest.rds.ind',
       remake_file='9_report.yml',
       config_file='lib/cfg/gd_config.yml')

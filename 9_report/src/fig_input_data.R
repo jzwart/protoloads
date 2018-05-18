@@ -1,19 +1,17 @@
-fig_input_data <- function(fig_ind, preds_ind, remake_file, config_file){
+fig_input_data <- function(fig_ind, input_example_yml, preds_ind, remake_file, config_file){
   #discharge, concentration, loads
 
-  site = '05465500'
-  model = 'long1'
-  ref_date = '2017-05-09'
+  input_ex <- yaml::yaml.load_file(input_example_yml)
 
   preds <- readRDS(sc_retrieve(preds_ind, remake_file)) %>%
-    dplyr::filter(ref_date == '2017-05-09', # dplyr::filter doesn't recognize objects??
-                  model_range == 'long1',
-                  Site == '05465500')
+    dplyr::filter(ref_date == !!(input_ex$ref_date),
+                  model_range == !!(input_ex$model),
+                  Site == !!(input_ex$site))
 
   # example of input data for a forecast
-  eList <- prep_inputs(nwis_site = site,
-              nwm_model = model,
-              ref_date = ref_date,
+  eList <- prep_inputs(nwis_site = input_ex$site,
+              nwm_model = input_ex$model,
+              ref_date = input_ex$ref_date,
               site_info_ind = '1_data/out/site_info.tsv.ind',
               nwis_data_ind = '2_munge/out/agg_nwis.rds.ind',
               nwm_retro_ind = '2_munge/out/agg_nwm_retro.rds.ind',
