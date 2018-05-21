@@ -35,6 +35,7 @@ targets:
     command: fig_preds_v_time(
       fig_ind=target_name,
       preds_ind='3_forecast/out/preds_wrtds.rds.ind',
+      agg_nwis_ind='2_munge/out/agg_nwis.rds.ind',
       remake_file='9_report.yml',
       config_file='lib/cfg/gd_config.yml')
   9_report/out/fig_preds_v_time.png:

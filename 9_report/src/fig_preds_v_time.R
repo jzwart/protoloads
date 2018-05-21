@@ -10,31 +10,17 @@ fig_preds_v_time <- function(fig_ind, preds_ind, agg_nwis_ind, remake_file, conf
     rename(site=site_no)
 
   # create the plot
-  g <- ggplot(preds_loadest, aes(x=Date, y=Flux, color=ref_date)) +
+  g <- ggplot(mutate(preds_df, LeadTime=as.numeric(Date - ref_date, units='days')), aes(x=Date, y=Flux/1000, color=LeadTime)) +
     geom_point() +
-    facet_wrap(~site, scale='free_y', nrow=3)
-
-
-
-  ggplot(mutate(preds_df, LeadTime=as.numeric(Date - ref_date, units='days')), aes(x=Date, y=Flux, color=LeadTime)) +
-    geom_point() +
-    geom_line(data=filter(agg_nwis$flux, date %in% preds_df$Date), aes(x=date, y=daily_mean_flux), color='red') +
+    geom_line(data=filter(agg_nwis$flux, date %in% preds_df$Date), aes(x=date, y=daily_mean_flux/1000), color='red') +
     facet_grid(site ~ ., scale='free_y') +
+    scale_color_continuous('Lead Time (d)') +
+    xlab('Date') +
+    ylab(expression('Flux'~(Mg~'N-NO'[3]~d^{-1}))) +
     theme_classic()
-
-  ggplot(mutate(preds_loadest, LeadTime=as.numeric(Date - ref_date, units='days')), aes(x=Date, y=Flux, color=LeadTime)) +
-    geom_point() +
-    geom_line(data=filter(agg_nwis$flux, date %in% preds_df$Date), aes(x=date, y=daily_mean_flux), color='red') +
-    facet_grid(site ~ ., scale='free_y') +
-    theme_classic()
-
-
-
-
-
 
   # save and post to Drive
   fig_file <- as_data_file(fig_ind)
-  ggsave(fig_file, plot=g)
+  ggsave(fig_file, plot=g, width=6, height=5)
   gd_put(remote_ind=fig_ind, local_source=fig_file, config_file=config_file)
 }
