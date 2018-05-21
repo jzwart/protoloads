@@ -1,12 +1,20 @@
 # list tasks
 # (2 model types per reference date)*(3 sites)*(30 valid dates)*(10sec/model)/(60sec*60min) = 40 minutes
-list_tasks <- function(sites_yml, remake_file) {
-  sites <- yaml::yaml.load_file(sc_retrieve(sites_yml, remake_file=remake_file))
-  valid_dates <- as.Date('2017-05-04') %>%
-    {seq(
-      .,
-      .+as.difftime(11,units='days'),
-      by=as.difftime(1,units='days'))}
+list_tasks <- function(site_info_ind, dates_yml, nwm_med_ind, nwm_long1_ind, remake_file) {
+  # read site/date selections and NWM forecasts
+  sites <- readr::read_tsv(sc_retrieve(site_info_ind, remake_file = remake_file))$site_no
+  dates <- yaml::yaml.load_file(dates_yml)
+  valid_dates <- seq(as.Date(dates$forecast$start), as.Date(dates$forecast$end), by=as.difftime(1, units='days'))
+  nwm_med <- readRDS(sc_retrieve(nwm_med_ind, remake_file))
+  nwm_long1 <- readRDS(sc_retrieve(nwm_long1_ind, remake_file))
+
+  # identify those ref_dates we have available from NWM
+  available_ref_dates <- bind_rows(
+    data_frame(model_range='med', ref_date=unique(nwm_med$ref_date)),
+    data_frame(model_range='long1', ref_date=unique(nwm_long1$ref_date))
+  )
+
+  # generate list of tasks
   tasks <-
     tidyr::crossing(
       model_range=c('med', 'long1'), # 'long2', 'long3', 'long4'
@@ -27,6 +35,7 @@ list_tasks <- function(sites_yml, remake_file) {
     ungroup() %>%
     select(-valid_date) %>%
     distinct() %>%
+    inner_join(available_ref_dates, by=c('model_range', 'ref_date')) %>% # limit to those ref dates available from NWM
     group_by(model_range, ref_date) %>%
     do(with(., {data_frame(model_range, ref_date, site=sites)})) %>%
     mutate(ref_datestr=format(ref_date, '%Y%m%d')) %>%
@@ -39,8 +48,7 @@ list_tasks <- function(sites_yml, remake_file) {
 }
 
 
-# prepare a plan for downloading (from WQP) and posting (to GD) one data file
-# per state
+
 plan_forecasts <- function(
   tasks_df, folders,
   site_info_ind, nwis_data_ind,

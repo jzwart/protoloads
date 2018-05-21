@@ -14,14 +14,22 @@ targets:
       - 3_forecast_taskmaster_all
 
   # Targets prepared in 1_data.yml
-  1_data/out/sites_subset.yml:
-    command: gd_get('1_data/out/sites_subset.yml.ind', config_file='lib/cfg/gd_config.yml')
-  1_data/out/comids.tsv:
-    command: gd_get('1_data/out/comids.tsv.ind', config_file='lib/cfg/gd_config.yml')
+  1_data_out:
+    depends:
+      - 1_data/out/site_info.tsv
   1_data/out/site_info.tsv:
     command: gd_get('1_data/out/site_info.tsv.ind', config_file='lib/cfg/gd_config.yml')
 
   # Targets prepared in 2_munge.yml
+  2_munge_out:
+    depends:
+      - 2_munge/out/agg_nwis.rds
+      - 2_munge/out/agg_nwm_retro.rds
+      - 2_munge/out/agg_nwm_med.rds
+      - 2_munge/out/agg_nwm_long1.rds
+      - 2_munge/out/agg_nwm_long2.rds
+      - 2_munge/out/agg_nwm_long3.rds
+      - 2_munge/out/agg_nwm_long4.rds
   2_munge/out/agg_nwis.rds:
     command: gd_get('2_munge/out/agg_nwis.rds.ind', config_file='lib/cfg/gd_config.yml')
   2_munge/out/agg_nwm_retro.rds:
@@ -45,3 +53,8 @@ targets:
   # contents change...but this needs some monitoring to see whether I've got it right.
   3_forecast_taskmaster_all:
     command: scmake(I('3_forecast_taskmaster'), remake_file='3_forecast_taskmaster.yml')
+
+  3_forecast/out/preds_wrtds.rds:
+    command: gd_get('3_forecast/out/preds_wrtds.rds.ind', config_file='lib/cfg/gd_config.yml')
+  3_forecast/out/preds_loadest.rds:
+    command: gd_get('3_forecast/out/preds_loadest.rds.ind', config_file='lib/cfg/gd_config.yml')

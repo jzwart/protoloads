@@ -1,0 +1,16 @@
+version: 0.3.0
+name: 9_report/out/fig_input_data.png.ind
+type: file
+hash: a82962bb73f7af169e9d0617d5313dc9
+time: 2018-05-21 18:51:12 UTC
+depends:
+  9_report/cfg/input_data_example.yml: 0021966637f21db2b9f1aa25d79e8e75
+  3_forecast/out/preds_loadest.rds.ind: eab9ab0ff450fc4b9cb2adf37182afc5
+  9_report.yml: e29c9a3a88e774569a158f86180cebcc
+  lib/cfg/gd_config.yml: cf9c52868594c233f17a6f751a553018
+fixed: 3248e37a1226d5781f23024fe4f432b9
+code:
+  functions:
+    fig_input_data: 51939b305617646e46842667dc7e2fc9
+    prep_inputs: 546a0a2c092c011a92d5ef7ffa343e35
+
