@@ -34,8 +34,8 @@ prep_inputs <- function(
   # 2016-11-08 and 2017-05-08, we we'll need to use the retro data for that
   # period for this "analysis" substitute
   nwm_analysis <- bind_rows(
-    nwm_retro %>% filter(date >= as.Date('2016-11-08'), date < min(nwm_forecast$valid_date)),
-    nwm_forecast %>% filter(ref_date == valid_date) %>% select(site_no, date = valid_date, flow))
+    nwm_retro %>% dplyr::filter(date >= as.Date('2016-11-08'), date < min(nwm_forecast$valid_date)),
+    nwm_forecast %>% dplyr::filter(ref_date == valid_date) %>% select(site_no, date = valid_date, flow))
 
   ## prepare the inputs for an EGRET eList ##
 
