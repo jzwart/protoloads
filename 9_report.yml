@@ -31,7 +31,7 @@ targets:
   9_report/out/fig_preds_v_time.png.ind:
     command: fig_preds_v_time(
       fig_ind=target_name,
-      preds_ind='3_forecast/out/preds_loadest.rds.ind',
+      preds_ind='3_forecast/out/preds_wrtds.rds.ind',
       remake_file='9_report.yml',
       config_file='lib/cfg/gd_config.yml')
   9_report/out/fig_preds_v_time.png:
