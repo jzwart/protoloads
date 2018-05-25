@@ -28,7 +28,16 @@ fig_error_v_leadtime <- function(fig_ind, preds_ind, agg_nwis_ind, remake_file, 
     ylab(expression('Flux'~(Mg~'N-NO'[3]~d^-1)))
   g
 
-    geom_line(data=filter(agg_nwis$flux, date %in% preds_df$Date), aes(x=date, y=daily_mean_flux/1000), color='red') +
+  g <- ggplot(error_df, aes(x=LeadTime, y=z_score_flux_error, color = model_range)) +
+    geom_point() +
+    facet_grid(site ~ ., scale = 'free_y') +
+    xlab('Lead Time (days)') +
+    ylab(expression('Z-scored flux error'))
+  g
+
+
+
+  geom_line(data=filter(agg_nwis$flux, date %in% preds_df$Date), aes(x=date, y=daily_mean_flux/1000), color='red') +
     facet_grid(site ~ ., scale='free_y') +
     scale_color_continuous('Lead Time (d)') +
     xlab('Date') +
