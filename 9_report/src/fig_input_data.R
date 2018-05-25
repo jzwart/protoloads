@@ -89,7 +89,7 @@ fig_input_data <- function(fig_ind, input_example_yml, preds_ind, remake_file, c
   g <- rbind(g1, g2, g3, size='first')
   g$widths <- grid::unit.pmax(g1$widths, g2$widths, g3$widths)
 
-  grid.draw(g)
+  # grid.draw(g)
 
   fig_file <- as_data_file(fig_ind)
   png(fig_file); grid::grid.draw(g); dev.off()
