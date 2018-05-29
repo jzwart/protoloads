@@ -15,37 +15,123 @@ fig_error_v_leadtime <- function(fig_ind, preds_ind, agg_nwis_ind, remake_file, 
                         by = c('site' = 'Site', 'date' = 'Date'),
                         suffix = c('_truth', '_pred')) %>%
     dplyr::filter(!is.na(Flux), !is.na(daily_mean_flux)) %>%
-    mutate(flux_error = Flux - daily_mean_flux) %>%
+    mutate(flux_error = Flux - daily_mean_flux,
+           std_flux_error = (Flux - daily_mean_flux)/daily_mean_flux) %>%
     group_by(site) %>%
     mutate(z_score_flux_error = (flux_error-mean(flux_error))/sd(flux_error)) %>% # z_score for error comparison between sites
     ungroup()
 
-  # create the plot
-  g <- ggplot(error_df, aes(x=LeadTime, y=flux_error/1000, group = LeadTime, fill = model_range)) +
-    geom_boxplot() +
-    facet_grid(site ~ ., scale = 'free_y') +
-    xlab('Lead Time (days)') +
-    ylab(expression('Flux'~(Mg~'N-NO'[3]~d^-1)))
-  g
+  sites = unique(error_df$site)
 
-  g <- ggplot(error_df, aes(x=LeadTime, y=z_score_flux_error, color = model_range)) +
-    geom_point() +
-    facet_grid(site ~ ., scale = 'free_y') +
-    xlab('Lead Time (days)') +
-    ylab(expression('Z-scored flux error'))
-  g
+  # flux error, no outliers
+  g1 <- ggplotGrob(ggplot(error_df[error_df$site==sites[1],], aes(x=factor(LeadTime), y=abs(flux_error/1000), fill = model_range)) +
+                     geom_boxplot(outlier.shape = NA,
+                                  width = 0.7) +
+                     theme_classic() +
+                     ylim(boxplot.stats(abs(error_df$flux_error[error_df$site==sites[1]]/1000))$stats[c(1,5)]) +
+                     scale_x_discrete(limits = rev(levels(factor(error_df$LeadTime[error_df$site==sites[1]])))) +
+                     theme(axis.title.x = element_blank(),
+                           axis.title.y = element_blank(),
+                           legend.position = c(.9,.8),
+                           legend.title = element_blank()) +
+                     annotate(geom = 'text',
+                              label = sites[1],
+                              x = 30.5,
+                              y = diff(boxplot.stats(abs(error_df$flux_error[error_df$site==sites[1]]/1000))$stats[c(1,5)])/2,
+                              angle = 270))
+
+  g2 <- ggplotGrob(ggplot(error_df[error_df$site==sites[2],], aes(x=factor(LeadTime), y=abs(flux_error/1000), fill = model_range)) +
+                     geom_boxplot(outlier.shape = NA,
+                                  width = 0.7) +
+                     theme_classic() +
+                     ylim(boxplot.stats(abs(error_df$flux_error[error_df$site==sites[2]]/1000))$stats[c(1,5)]) +
+                     scale_x_discrete(limits = rev(levels(factor(error_df$LeadTime[error_df$site==sites[1]])))) +
+                     theme(axis.title.x = element_blank(),
+                           legend.position = 'none') +
+                     ylab(expression('Absolute flux error'~(Mg~'N-NO'[3]~d^-1)))+
+                     annotate(geom = 'text',
+                              label = sites[2],
+                              x = 30.5,
+                              y = diff(boxplot.stats(abs(error_df$flux_error[error_df$site==sites[2]]/1000))$stats[c(1,5)])/2,
+                              angle = 270))
+
+  g3 <- ggplotGrob(ggplot(error_df[error_df$site==sites[3],], aes(x=factor(LeadTime), y=abs(flux_error/1000), fill = model_range)) +
+                     geom_boxplot(outlier.shape = NA,
+                                  width = 0.7) +
+                     theme_classic() +
+                     ylim(boxplot.stats(abs(error_df$flux_error[error_df$site==sites[3]]/1000))$stats[c(1,5)]) +
+                     scale_x_discrete(limits = rev(levels(factor(error_df$LeadTime[error_df$site==sites[1]])))) +
+                     xlab('Lead Time (days)') +
+                     theme(legend.position = 'none',
+                           axis.title.y = element_blank()) +
+                     annotate(geom = 'text',
+                                label = sites[3],
+                                x = 30.5,
+                                y = diff(boxplot.stats(abs(error_df$flux_error[error_df$site==sites[3]]/1000))$stats[c(1,5)])/2,
+                                angle = 270))
+
+  g <- rbind(g1, g2, g3, size='first')
+  g$widths <- grid::unit.pmax(g1$widths, g2$widths, g3$widths)
+
+  windows()
+  grid.draw(g)
 
 
+  # standardized flux error
+  g1 <- ggplotGrob(ggplot(error_df[error_df$site==sites[1],], aes(x=factor(LeadTime), y=abs(std_flux_error), fill = model_range)) +
+                     geom_boxplot(outlier.shape = NA,
+                                  width = 0.7) +
+                     theme_classic()+
+                     ylim(boxplot.stats(abs(error_df$std_flux_error[error_df$site==sites[1]]))$stats[c(1,5)]) +
+                     scale_x_discrete(limits = rev(levels(factor(error_df$LeadTime[error_df$site==sites[1]])))) +
+                     theme(axis.title.x = element_blank(),
+                           axis.title.y = element_blank(),
+                           legend.position = c(.8,.8),
+                           legend.title = element_blank())+
+                     annotate(geom = 'text',
+                              label = sites[1],
+                              x = 30.5,
+                              y = diff(boxplot.stats(abs(error_df$std_flux_error[error_df$site==sites[1]]))$stats[c(1,5)])/2,
+                              angle = 270))
 
-  geom_line(data=filter(agg_nwis$flux, date %in% preds_df$Date), aes(x=date, y=daily_mean_flux/1000), color='red') +
-    facet_grid(site ~ ., scale='free_y') +
-    scale_color_continuous('Lead Time (d)') +
-    xlab('Date') +
-    ylab(expression('Flux'~(Mg~'N-NO'[3]~d^{-1}))) +
-    theme_classic()
+  g2 <- ggplotGrob(ggplot(error_df[error_df$site==sites[2],], aes(x=factor(LeadTime), y=abs(std_flux_error), fill = model_range)) +
+                     geom_boxplot(outlier.shape = NA,
+                                  width = 0.7) +
+                     theme_classic()+
+                     ylim(abs(boxplot.stats(error_df$std_flux_error[error_df$site==sites[2]])$stats[c(1,5)])) +
+                     scale_x_discrete(limits = rev(levels(factor(error_df$LeadTime[error_df$site==sites[1]])))) +
+                     theme(axis.title.x = element_blank(),
+                           legend.position = 'none') +
+                     ylab(expression('Relative flux error'~('error'~'/'~'flux')))+
+                     annotate(geom = 'text',
+                              label = sites[2],
+                              x = 30.5,
+                              y = diff(boxplot.stats(abs(error_df$std_flux_error[error_df$site==sites[2]]))$stats[c(1,5)])/2,
+                              angle = 270))
+
+  g3 <- ggplotGrob(ggplot(error_df[error_df$site==sites[3],], aes(x=factor(LeadTime), y=abs(std_flux_error), fill = model_range)) +
+                     geom_boxplot(outlier.shape = NA,
+                                  width = 0.7) +
+                     theme_classic()+
+                     ylim(abs(boxplot.stats(error_df$std_flux_error[error_df$site==sites[3]])$stats[c(1,5)])) +
+                     scale_x_discrete(limits = rev(levels(factor(error_df$LeadTime[error_df$site==sites[1]])))) +
+                     xlab('Lead Time (days)') +
+                     theme(legend.position = 'none',
+                           axis.title.y = element_blank())+
+                     annotate(geom = 'text',
+                              label = sites[3],
+                              x = 30.5,
+                              y = diff(boxplot.stats(abs(error_df$std_flux_error[error_df$site==sites[3]]))$stats[c(1,5)])/2,
+                              angle = 270))
+
+  g <- rbind(g1, g2, g3, size='first')
+  g$widths <- grid::unit.pmax(g1$widths, g2$widths, g3$widths)
+
+  windows()
+  grid.draw(g)
 
   # save and post to Drive
   fig_file <- as_data_file(fig_ind)
-  ggsave(fig_file, plot=g, width=6, height=5)
+  png(fig_file); grid::grid.draw(g); dev.off()
   gd_put(remote_ind=fig_ind, local_source=fig_file, config_file=config_file)
 }
