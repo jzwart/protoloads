@@ -31,6 +31,7 @@ targets:
   nwm:
     depends:
       - 1_data/out/nwm_retro.nc.ind
+      - 1_data/out/nwm_ana.nc.ind
       - 1_data/out/nwm_med.nc.ind
       - 1_data/out/nwm_long1.nc.ind
       - 1_data/out/nwm_long2.nc.ind
@@ -93,6 +94,14 @@ targets:
     command: subset_nwm(
       ind_file=target_name,
       model_configuration=I('http://localhost/thredds/dodsC/nwm_retro'),
+      comids='1_data/out/comids.tsv.ind',
+      remake_file = I('1_data.yml'),
+      gd_config='lib/cfg/gd_config.yml')
+
+  1_data/out/nwm_ana.nc.ind:
+    command: subset_nwm(
+      ind_file=target_name,
+      model_configuration=I('http://localhost/thredds/dodsC/analysis_assim'),
       comids='1_data/out/comids.tsv.ind',
       remake_file = I('1_data.yml'),
       gd_config='lib/cfg/gd_config.yml')
