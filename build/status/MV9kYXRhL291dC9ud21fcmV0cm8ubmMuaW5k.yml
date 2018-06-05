@@ -2,12 +2,12 @@ version: 0.3.0
 name: 1_data/out/nwm_retro.nc.ind
 type: file
 hash: 3fe42196f344815867d91c30320f3153
-time: 2018-05-30 14:31:32 UTC
+time: 2018-06-05 22:20:34 UTC
 depends:
   1_data/out/comids.tsv.ind: 7ec117389b1681f08f01c164d1a3bd11
   lib/cfg/gd_config.yml: cf9c52868594c233f17a6f751a553018
 fixed: a8172c5a841f118978ca23ea7fb87e67
 code:
   functions:
-    subset_nwm: 8febb6322d7b75d987a31c33de3701f2
+    subset_nwm: 00e37ec4a6e556d1bf76d0d163e48a47
 

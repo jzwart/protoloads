@@ -37,7 +37,7 @@ subset_nwm <- function(ind_file, model_configuration, comids, remake_file, gd_co
     time_dim <- ncdim_def(nc$dim$time$name,
                           units = "",
                           vals = 1:nc$dim$time$len,
-                          unlim = FALSE, create_dimvar = T)
+                          unlim = FALSE, create_dimvar = FALSE)
 
     reference_time_dim <- ncdim_def(nc$dim$reference_time$name,
                                     units = "",
@@ -49,6 +49,11 @@ subset_nwm <- function(ind_file, model_configuration, comids, remake_file, gd_co
                            prec = "integer",
                            dim = list(new_feature_id_dim,
                                       time_dim,
+                                      reference_time_dim)),
+                 ncvar_def(nc$dim$time$name,
+                           units = nc$dim$time$units,
+                           prec = "integer",
+                           dim = list(time_dim,
                                       reference_time_dim)),
                  ncvar_def(nc$dim$reference_time$name,
                            units = nc$dim$reference_time$units,
@@ -101,6 +106,7 @@ subset_nwm <- function(ind_file, model_configuration, comids, remake_file, gd_co
 
   if("reference_time" %in% names(nc$dim)) {
     ncvar_put(new_nc, "reference_time", nc$dim$reference_time$vals)
+    ncvar_put(new_nc, "time", nc$dim$time$vals)
   }
 
   ncvar_put(new_nc, new_nc$var$latitude, ncvar_get(nc, nc$var$latitude)[site_inds])
