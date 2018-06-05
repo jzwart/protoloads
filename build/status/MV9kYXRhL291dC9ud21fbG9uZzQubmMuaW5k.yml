@@ -1,13 +1,13 @@
 version: 0.3.0
 name: 1_data/out/nwm_long4.nc.ind
 type: file
-hash: c3ba3ec31f1eb79c770458aeed9a824d
-time: 2018-05-30 15:18:48 UTC
+hash: 04e5e186f2932783248892bf7a60a4ee
+time: 2018-06-05 22:32:02 UTC
 depends:
   1_data/out/comids.tsv.ind: 7ec117389b1681f08f01c164d1a3bd11
   lib/cfg/gd_config.yml: cf9c52868594c233f17a6f751a553018
 fixed: de09f12ad64c1a9edcb9b2241b6e8358
 code:
   functions:
-    subset_nwm: 8febb6322d7b75d987a31c33de3701f2
+    subset_nwm: 5d6c016c1d2f0957a76e054bd5c22824
 
