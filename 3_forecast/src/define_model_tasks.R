@@ -52,7 +52,7 @@ list_tasks <- function(site_info_ind, dates_yml, nwm_med_ind, nwm_long1_ind, rem
 plan_forecasts <- function(
   tasks_df, folders,
   site_info_ind, nwis_data_ind,
-  nwm_retro_ind, nwm_med_ind, nwm_long1_ind, nwm_long2_ind, nwm_long3_ind, nwm_long4_ind,
+  nwm_ana_ind, nwm_retro_ind, nwm_med_ind, nwm_long1_ind, nwm_long2_ind, nwm_long3_ind, nwm_long4_ind,
   remake_file
 ) {
 
@@ -82,6 +82,7 @@ plan_forecasts <- function(
         "ref_date=I('%s'),"=task_info$ref_date,
         "site_info_ind='%s',"=site_info_ind,
         "nwis_data_ind='%s',"=nwis_data_ind,
+        "nwm_ana_ind='%s',"=nwm_ana_ind,
         "nwm_retro_ind='%s',"=nwm_retro_ind,
         "nwm_forecast_ind='%s',"=if(task_info$model_range=='med') nwm_med_ind else nwm_long1_ind,
         "remake_file='%s')"=remake_file,

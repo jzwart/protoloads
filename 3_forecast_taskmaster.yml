@@ -48,6 +48,7 @@ targets:
       folders=forecast_folders,
       site_info_ind=I('1_data/out/site_info.tsv.ind'),
       nwis_data_ind=I('2_munge/out/agg_nwis.rds.ind'),
+      nwm_ana_ind=I('2_munge/out/agg_nwm_ana.rds.ind'),
       nwm_retro_ind=I('2_munge/out/agg_nwm_retro.rds.ind'),
       nwm_med_ind  =I('2_munge/out/agg_nwm_med.rds.ind'),
       nwm_long1_ind=I('2_munge/out/agg_nwm_long1.rds.ind'),
