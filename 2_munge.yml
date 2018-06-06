@@ -4,6 +4,8 @@ include:
   - lib.yml
 
 packages:
+  - ncdf4
+  - tidyverse
 
 sources:
   - 2_munge/src/aggregate_inputs.R

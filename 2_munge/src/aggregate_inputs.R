@@ -54,11 +54,8 @@ aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_file, gd_co
 
   # pick out site indices and identifiers
   site_inds <- which(input_raw$dim$feature_id$vals %in% sites$COMID) # indices into original nc file
-
-  # duplicates are no longer an issue, so the following is commented out:
-  # site_inds <- site_inds[4:6]
-
   new_feature_id <- input_raw$dim$feature_id$vals[site_inds] # comid list
+  site_nos = sites$site_no[match(input_raw$dim$feature_id$vals[site_inds],sites$COMID)]
 
   # decide what sort of file we're working with (retro or forecast)
   dimids <- input_raw$var$streamflow$dimids
@@ -66,112 +63,76 @@ aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_file, gd_co
   is_retro <- length(dimids) == 2 # or grepl('retro', ind_file)
   is_forecast <- !is_analysis && length(dimids) == 3
 
-  # create a matrix and dimension names appropriate to the format for this analysis/forecast dataset
+  # generate a tidy data_frame of predictions
   if(is_retro) {
-    streamflow <- matrix(nrow=input_raw$dim$time$len*length(site_inds), ncol=1)
-    time <- convert_time_nc2posix(input_raw$var$streamflow$dim[[2]]) # time value converted to posix
-  } else if(is_analysis || is_forecast) {
-    streamflow <- matrix(nrow = length(site_inds) * input_raw$dim$time$len, ncol = input_raw$dim$reference_time$len)
-    valid_time <- input_raw$var$streamflow$dim[[2]]$vals
-    ref_time <- convert_time_nc2posix(input_raw$var$streamflow$dim[[3]]) # ref time value converted to posix
-  }
-
-  # populate the matrix by extracting values from the nc file
-  for(s in 1:length(site_inds)) {
-    if(is_retro) {
-      streamflow[((s-1)*length(time)+1):((s)*length(time)),1] <-
-        ncvar_get(
+    ref_times <- convert_time_nc2posix(input_raw$var$streamflow$dim[[2]])
+    raw_nwm <- bind_rows(lapply(1:length(site_inds), function(s) {
+      data_frame(
+        site_no=site_nos[s],
+        time=ref_times,
+        flow = ncvar_get(
           input_raw, input_raw$var$streamflow,
           start = c(site_inds[s], 1),
           count = c(1, -1),
           raw_datavals = TRUE)
-    } else if(is_analysis || is_forecast) {
-      for(r in 1:input_raw$dim$reference_time$len) {
-        streamflow[((s-1)*length(valid_time)+1):((s)*length(valid_time)),r] <-
-          ncvar_get(
+      )
+    }))
+  } else if(is_analysis || is_forecast) {
+    val_times <- convert_time_nc2posix(input_raw$var$streamflow$dim[[2]])
+    ref_times <- convert_time_nc2posix(input_raw$var$streamflow$dim[[3]])
+    raw_nwm <- bind_rows(lapply(1:length(site_inds), function(s) {
+      bind_rows(lapply(1:length(ref_times), function(r) {
+        data_frame(
+          site_no=site_nos[s],
+          ref_time=ref_times[r],
+          valid_time=val_times[,r],
+          flow = ncvar_get(
             input_raw, input_raw$var$streamflow,
             start = c(site_inds[s], 1, r),
             count = c(1, -1, 1),
             raw_datavals = TRUE)
-      }
-    }
+        )
+      }))
+    }))
   }
 
-  # convert the matrix into a long-form data_frame and aggregate to daily means
-  site_nos = sites$site_no[match(input_raw$dim$feature_id$vals[site_inds],sites$COMID)]
-  n_sites = length(site_nos)
+  # munge and group data according to the data type
   if(is_retro){
-    n_times <- length(time)
-    agg_nwm <- streamflow %>%
-      as.data.frame() %>%
-      setNames('flow') %>%
+    valid_time_step <- 1
+    grouped_nwm <- raw_nwm %>%
+      # use 1am to 12am to be more similar to med & long forecast daily means:
+      mutate(date = as.Date(time - as.difftime(1/60, units = 'hours'))) %>%
+      group_by(site_no, date)
+
+  } else if(is_analysis) {
+    valid_time_step <- 1
+    grouped_nwm <- raw_nwm %>%
       mutate(
-        time = rep(time, n_sites),
-        date = as.Date(time - as.difftime(1/60, units = 'hours')), # use 1am to 12am to be more similar to med & long forecast daily means
-        site_no = rep(site_nos, each = n_times)) %>%
-      group_by(site_no, date) %>%
-      summarise(
-        n = length(flow),
-        flow = if(n==24) mean(flow) else NA) %>%
-      ungroup()
-
-  }else if(is_analysis){
-    valid_time_step = 1 # analysis goes back 3 hours?
-
-    agg_nwm <- streamflow %>%
-      as.data.frame() %>%
-      setNames(ref_time) %>% # columns are ref_time
-      dplyr::do(with(., {
-        ref_times = rep(as.POSIXct(colnames(.), tz='UTC'), each = nrow(.))
-        ref_dates = rep(as.Date(colnames(.), tz = 'UTC'), each = nrow(.))
-        n_ref_dates = ncol(.)
-        n_valid_times = input_raw$dim$time$len
-
-        out = data_frame(
-          ref_time = ref_times,
-          ref_date = ref_dates,
-          valid_time_hrs = rep(valid_time, n_ref_dates * n_sites),
-          flow = as.vector(as.matrix(.)),
-          site_no = rep(rep(site_nos, each = n_valid_times), times=n_ref_dates))
-      })) %>%
-      mutate(
-        valid_time = ref_time + as.difftime((valid_time_hrs - 3) * valid_time_step, units = 'hours'), # guessing on subtraction - Dave?
         valid_date = as.Date(valid_time)) %>%
-      filter(ref_time == valid_time) %>% # we only want ref datetimes that equal the valid datetime. guessing on 3 - Dave?
-      group_by(ref_date, valid_date, site_no) %>%
-      summarise(
-        n = length(flow),
-        flow = if(n==24/valid_time_step) mean(flow) else NA) %>%
-      ungroup()
+      filter(valid_time == ref_time + as.difftime(3, units='hours')) %>%
+      group_by(site_no, valid_date)
 
-  }else if(is_forecast){
-    valid_time_step = ifelse(length(grep('med',ind_file))>0, 3, 6) #medium range valid_date time step is 3 hours, long range is 6 hours
-
-    agg_nwm <- streamflow %>%
-      as.data.frame() %>%
-      setNames(ref_time) %>% # columns are ref_time
-      select(contains('00:00:00')) %>% # we only want ref dates that start at midnight
-      dplyr::do(with(., {
-        ref_dates = rep(as.Date(colnames(.), tz = 'UTC'), each = nrow(.))
-        n_ref_dates = length(unique(ref_dates)) # is unique() the right logic here? or does it only work because we've already selected down to unique dates?
-        n_valid_times = input_raw$dim$time$len
-
-        out = data_frame(
-          ref_date = ref_dates,
-          valid_time_hrs = rep(valid_time, n_ref_dates * n_sites),
-          flow = as.vector(as.matrix(.)),
-          site_no = rep(rep(site_nos, each = n_valid_times), times=n_ref_dates))
-      })) %>%
+  } else if(is_forecast) {
+    # decide what time step should be: medium range valid_date time step is 3
+    # hours, long range is 6 hours
+    valid_time_step <- ifelse(length(grep('med',ind_file)) > 0, 3, 6)
+    grouped_nwm <- raw_nwm %>%
+      filter(grepl('00:00:00', ref_time)) %>% # we only want ref dates that start at midnight
       mutate(
-        valid_time = as.POSIXlt(ref_date) + as.difftime(valid_time_hrs * valid_time_step, units = 'hours'),
+        ref_date = as.Date(ref_time),
         valid_date = as.Date(valid_time - as.difftime(1/60, units = 'hours'))) %>%
-      group_by(ref_date, valid_date, site_no) %>%
-      summarise(
-        n = length(flow),
-        flow = if(n==24/valid_time_step) mean(flow) else NA) %>%
-      ungroup()
+      group_by(site_no, ref_date, valid_date)
   }
 
+  # aggregate according to the groups set above
+  agg_nwm <- grouped_nwm %>%
+    summarise(
+      n = length(flow),
+      flow = if(n==24/valid_time_step) mean(flow) else NA) %>%
+    ungroup() %>%
+    filter(!is.na(flow))
+
+  # write and post the output
   data_file <- as_data_file(ind_file)
   saveRDS(agg_nwm, data_file)
   gd_put(remote_ind = ind_file, local_source = data_file, config_file = gd_config)
