@@ -1,7 +1,7 @@
 prep_inputs <- function(
   nwis_site, nwm_model, ref_date,
   site_info_ind, nwis_data_ind,
-  nwm_retro_ind, nwm_forecast_ind,
+  nwm_ana_ind, nwm_retro_ind, nwm_forecast_ind,
   remake_file
 ) {
 
@@ -10,6 +10,9 @@ prep_inputs <- function(
     lapply(function(df) dplyr::filter(df, site_no == nwis_site))
   site_info <- suppressMessages(readr::read_tsv(sc_retrieve(site_info_ind, remake_file))) %>%
     dplyr::filter(site_no == nwis_site)
+  nwm_ana <- readRDS(sc_retrieve(nwm_ana_ind, remake_file)) %>%
+    dplyr::filter(site_no == nwis_site) %>%
+    dplyr::filter(!is.na(flow))
   nwm_retro <- readRDS(sc_retrieve(nwm_retro_ind, remake_file)) %>%
     dplyr::filter(site_no == nwis_site)
   nwm_forecast <- readRDS(sc_retrieve(nwm_forecast_ind, remake_file)) %>%
@@ -23,19 +26,18 @@ prep_inputs <- function(
   forecast_range <- as.integer(ifelse(nwm_model=='med', 10, 30))
   end_forecast <- ref_Date + as.difftime(forecast_range-1, units='days')
 
-  # ultimately we'd like to use the analysis data for some gap between retro and
-  # forecast flow predictions, but for now we have (1) no analysis data
-  # available yet and (2) the retro ends 12/31/2017, so for later models there
-  # are NAs if we only use retro plus a single reference date. SO: for now we'll
-  # create a substitude "analysis" dataset made of lag-0 "forecasts" from
-  # previous reference days. we'll make this analysis dataset cover the period
-  # from 6 months before the reference date up until the reference date (defined
-  # in start_analysis above). But we don't have this "analysis" data between
-  # 2016-11-08 and 2017-05-08, we we'll need to use the retro data for that
-  # period for this "analysis" substitute
+  # ideally we'd always use the analysis data for a 6-month gap between retro
+  # and forecast flow predictions (6 months defined by 182 days in definition of
+  # start_analysis above). however, the analysis data starts the same day as the
+  # forecasts and analysis data begin, so we need to backfill between 2016-11-08
+  # and 2017-05-08 with a substitude "analysis" dataset made of the retro data
+  # for that period
   nwm_analysis <- bind_rows(
-    nwm_retro %>% dplyr::filter(date >= as.Date('2016-11-08'), date < min(nwm_forecast$valid_date)),
-    nwm_forecast %>% dplyr::filter(ref_date == valid_date) %>% select(site_no, date = valid_date, flow))
+    nwm_retro %>%
+      dplyr::filter(date >= as.Date('2016-11-08'), date < min(nwm_ana$valid_date)) %>%
+      rename(valid_date=date),
+    nwm_ana %>%
+      select(site_no, valid_date, flow))
 
   ## prepare the inputs for an EGRET eList ##
 
@@ -45,8 +47,8 @@ prep_inputs <- function(
     dplyr::filter(date >= start_calib, date < start_analysis) %>%
     select(dateTime=date, value=flow)
   flow_analysis <- nwm_analysis %>%
-    dplyr::filter(date >= start_analysis, date < ref_Date) %>%
-    select(dateTime=date, value=flow)
+    dplyr::filter(valid_date >= start_analysis, valid_date < ref_Date) %>%
+    select(dateTime=valid_date, value=flow)
   flow_future <- nwm_forecast %>%
     dplyr::filter(ref_date == ref_Date) %>%
     select(dateTime=valid_date, value=flow)
@@ -60,9 +62,11 @@ prep_inputs <- function(
     EGRET::populateDaily(qConvert=q_divisor, verbose = FALSE)
   #Daily <- readNWISDaily("06934500","00060","1979-10-01","2010-09-30")
   if(any(is.na(flow$Q)) || any(is.na(flow$LogQ))) {
+    noQ_dates <- filter(flow_conc, is.na(Q) | is.na(LogQ)) %>% pull(Date)
     message(sprintf(
-      'Found %d NA values in Q and %d NA values in logQ; removing all corresponding rows',
-      length(which(is.na(flow$Q))), length(which(is.na(flow$LogQ)))))
+      'Found %d NA values in Q and %d NA values in logQ; removing all corresponding dates: %s',
+      length(which(is.na(flow$Q))), length(which(is.na(flow$LogQ))),
+      paste(noQ_dates, collapse=', ')))
     flow <- dplyr::filter(flow, !is.na(Q), !is.na(LogQ))
   }
 
@@ -106,7 +110,7 @@ prep_inputs <- function(
   # make sure the merge will go smoothly
   flow_conc <- left_join(conc, flow, by='Date')
   if(any(is.na(flow_conc$Q))) {
-    noQ_dates <- filter(flow_conc, is.na(Q))$Date
+    noQ_dates <- filter(flow_conc, is.na(Q)) %>% pull(Date)
     message(sprintf(
       'Found %d NA values in Q after merging flow and conc; removing those samples',
       length(noQ_dates)))

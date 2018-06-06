@@ -24,6 +24,7 @@ targets:
   2_munge_out:
     depends:
       - 2_munge/out/agg_nwis.rds
+      - 2_munge/out/agg_nwm_ana.rds
       - 2_munge/out/agg_nwm_retro.rds
       - 2_munge/out/agg_nwm_med.rds
       - 2_munge/out/agg_nwm_long1.rds
@@ -32,6 +33,8 @@ targets:
       - 2_munge/out/agg_nwm_long4.rds
   2_munge/out/agg_nwis.rds:
     command: gd_get('2_munge/out/agg_nwis.rds.ind', config_file='lib/cfg/gd_config.yml')
+  2_munge/out/agg_nwm_ana.rds:
+    command: gd_get('2_munge/out/agg_nwm_ana.rds.ind', config_file='lib/cfg/gd_config.yml')
   2_munge/out/agg_nwm_retro.rds:
     command: gd_get('2_munge/out/agg_nwm_retro.rds.ind', config_file='lib/cfg/gd_config.yml')
   2_munge/out/agg_nwm_med.rds:
