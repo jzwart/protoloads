@@ -55,22 +55,22 @@ aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_file, gd_co
   # pick out site indices and identifiers
   site_inds <- which(input_raw$dim$feature_id$vals %in% sites$COMID) # indices into original nc file
 
-  #need to figure out which site_no of the duplicates are correct;
-  # looks like the second half of the all the site pulls are correct; but need to check this later if new sites are added
-  site_inds <- site_inds[4:6]
+  # duplicates are no longer an issue, so the following is commented out:
+  # site_inds <- site_inds[4:6]
 
   new_feature_id <- input_raw$dim$feature_id$vals[site_inds] # comid list
 
   # decide what sort of file we're working with (retro or forecast)
   dimids <- input_raw$var$streamflow$dimids
-  is_retro <- length(dimids) == 2 # or length(grep('retro',ind_file))>0
-  is_forecast <- length(dimids) == 3
+  is_analysis <- grepl('ana', ind_file)
+  is_retro <- length(dimids) == 2 # or grepl('retro', ind_file)
+  is_forecast <- !is_analysis && length(dimids) == 3
 
   # create a matrix and dimension names appropriate to the format for this analysis/forecast dataset
   if(is_retro) {
     streamflow <- matrix(nrow=input_raw$dim$time$len*length(site_inds), ncol=1)
     time <- convert_time_nc2posix(input_raw$var$streamflow$dim[[2]]) # time value converted to posix
-  } else if (is_forecast) {
+  } else if(is_analysis || is_forecast) {
     streamflow <- matrix(nrow = length(site_inds) * input_raw$dim$time$len, ncol = input_raw$dim$reference_time$len)
     valid_time <- input_raw$var$streamflow$dim[[2]]$vals
     ref_time <- convert_time_nc2posix(input_raw$var$streamflow$dim[[3]]) # ref time value converted to posix
@@ -85,8 +85,7 @@ aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_file, gd_co
           start = c(site_inds[s], 1),
           count = c(1, -1),
           raw_datavals = TRUE)
-
-    } else if(is_forecast) {
+    } else if(is_analysis || is_forecast) {
       for(r in 1:input_raw$dim$reference_time$len) {
         streamflow[((s-1)*length(valid_time)+1):((s)*length(valid_time)),r] <-
           ncvar_get(
@@ -116,6 +115,35 @@ aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_file, gd_co
         flow = if(n==24) mean(flow) else NA) %>%
       ungroup()
 
+  }else if(is_analysis){
+    valid_time_step = 1 # analysis goes back 3 hours?
+
+    agg_nwm <- streamflow %>%
+      as.data.frame() %>%
+      setNames(ref_time) %>% # columns are ref_time
+      dplyr::do(with(., {
+        ref_times = rep(as.POSIXct(colnames(.), tz='UTC'), each = nrow(.))
+        ref_dates = rep(as.Date(colnames(.), tz = 'UTC'), each = nrow(.))
+        n_ref_dates = ncol(.)
+        n_valid_times = input_raw$dim$time$len
+
+        out = data_frame(
+          ref_time = ref_times,
+          ref_date = ref_dates,
+          valid_time_hrs = rep(valid_time, n_ref_dates * n_sites),
+          flow = as.vector(as.matrix(.)),
+          site_no = rep(rep(site_nos, each = n_valid_times), times=n_ref_dates))
+      })) %>%
+      mutate(
+        valid_time = ref_time + as.difftime((valid_time_hrs - 3) * valid_time_step, units = 'hours'), # guessing on subtraction - Dave?
+        valid_date = as.Date(valid_time)) %>%
+      filter(ref_time == valid_time) %>% # we only want ref datetimes that equal the valid datetime. guessing on 3 - Dave?
+      group_by(ref_date, valid_date, site_no) %>%
+      summarise(
+        n = length(flow),
+        flow = if(n==24/valid_time_step) mean(flow) else NA) %>%
+      ungroup()
+
   }else if(is_forecast){
     valid_time_step = ifelse(length(grep('med',ind_file))>0, 3, 6) #medium range valid_date time step is 3 hours, long range is 6 hours
 
@@ -125,7 +153,7 @@ aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_file, gd_co
       select(contains('00:00:00')) %>% # we only want ref dates that start at midnight
       dplyr::do(with(., {
         ref_dates = rep(as.Date(colnames(.), tz = 'UTC'), each = nrow(.))
-        n_ref_dates = length(unique(ref_dates))
+        n_ref_dates = length(unique(ref_dates)) # is unique() the right logic here? or does it only work because we've already selected down to unique dates?
         n_valid_times = input_raw$dim$time$len
 
         out = data_frame(
