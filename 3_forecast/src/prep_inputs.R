@@ -62,7 +62,7 @@ prep_inputs <- function(
     EGRET::populateDaily(qConvert=q_divisor, verbose = FALSE)
   #Daily <- readNWISDaily("06934500","00060","1979-10-01","2010-09-30")
   if(any(is.na(flow$Q)) || any(is.na(flow$LogQ))) {
-    noQ_dates <- filter(flow_conc, is.na(Q) | is.na(LogQ)) %>% pull(Date)
+    noQ_dates <- dplyr::filter(flow_conc, is.na(Q) | is.na(LogQ)) %>% pull(Date)
     message(sprintf(
       'Found %d NA values in Q and %d NA values in logQ; removing all corresponding dates: %s',
       length(which(is.na(flow$Q))), length(which(is.na(flow$LogQ))),
@@ -110,7 +110,7 @@ prep_inputs <- function(
   # make sure the merge will go smoothly
   flow_conc <- left_join(conc, flow, by='Date')
   if(any(is.na(flow_conc$Q))) {
-    noQ_dates <- filter(flow_conc, is.na(Q)) %>% pull(Date)
+    noQ_dates <- dplyr::filter(flow_conc, is.na(Q)) %>% pull(Date)
     message(sprintf(
       'Found %d NA values in Q after merging flow and conc; removing those samples',
       length(noQ_dates)))

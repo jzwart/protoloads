@@ -109,7 +109,7 @@ aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_file, gd_co
     grouped_nwm <- raw_nwm %>%
       mutate(
         valid_date = as.Date(valid_time)) %>%
-      filter(valid_time == ref_time + as.difftime(3, units='hours')) %>%
+      dplyr::filter(valid_time == ref_time + as.difftime(3, units='hours')) %>%
       group_by(site_no, valid_date)
 
   } else if(is_forecast) {
@@ -117,7 +117,7 @@ aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_file, gd_co
     # hours, long range is 6 hours
     valid_time_step <- ifelse(length(grep('med',ind_file)) > 0, 3, 6)
     grouped_nwm <- raw_nwm %>%
-      filter(grepl('00:00:00', ref_time)) %>% # we only want ref dates that start at midnight
+      dplyr::filter(grepl('00:00:00', ref_time)) %>% # we only want ref dates that start at midnight
       mutate(
         ref_date = as.Date(ref_time),
         valid_date = as.Date(valid_time - as.difftime(1/60, units = 'hours'))) %>%
@@ -130,7 +130,7 @@ aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_file, gd_co
       n = length(flow),
       flow = if(n==24/valid_time_step) mean(flow) else NA) %>%
     ungroup() %>%
-    filter(!is.na(flow))
+    dplyr::filter(!is.na(flow))
 
   # write and post the output
   data_file <- as_data_file(ind_file)
