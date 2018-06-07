@@ -1,0 +1,12 @@
+flow_class:
+  high: 'lightblue'
+  med: 'lightgreen'
+  low: 'orange'
+
+model_range:
+  long1: 'lightblue'
+  med: 'orange'
+
+load_model:
+  loadest: 'lightblue'
+  wrtds: 'orange'
