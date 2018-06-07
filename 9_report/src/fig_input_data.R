@@ -93,6 +93,6 @@ fig_input_data <- function(fig_ind, input_example_yml, preds_ind, remake_file, c
   # grid.draw(g)
 
   fig_file <- as_data_file(fig_ind)
-  png(fig_file); grid::grid.draw(g); dev.off()
+  png(fig_file, width = 10, height = 7, units = 'in',res = 600); grid::grid.draw(g); dev.off()
   gd_put(remote_ind=fig_ind, local_source=fig_file, config_file=config_file)
 }
