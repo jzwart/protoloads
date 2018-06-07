@@ -15,6 +15,22 @@ gather_forecasts <- function(ind_file, task_df, task_plan, load_model, gd_config
   }) %>%
     bind_rows()
 
+  # temporary fix for scale factor issue noted in https://github.com/USGS-R/protoloads/issues/68
+  model_outputs <- model_outputs %>%
+    mutate(
+      Flow = Flow / 100,
+      Flux = Flux / 100
+    )
+  if(grepl('loadest', ind_file)) {
+    model_outputs <- model_outputs %>%
+      mutate(
+        Std.Err.Flux = Std.Err.Flux / 100,
+        SEP.Flux = SEP.Flux / 100,
+        L95.Flux = L95.Flux / 100,
+        U95.Flux = U95.Flux / 100
+      )
+  }
+
   # save and post the output, returning an indicator file
   data_file <- as_data_file(ind_file)
   saveRDS(model_outputs, data_file)
