@@ -14,6 +14,7 @@ fig_input_data <- function(fig_ind, input_example_yml, preds_ind, remake_file, c
               ref_date = input_ex$ref_date,
               site_info_ind = '1_data/out/site_info.tsv.ind',
               nwis_data_ind = '2_munge/out/agg_nwis.rds.ind',
+              nwm_ana_ind = '2_munge/out/agg_nwm_ana.rds.ind',
               nwm_retro_ind = '2_munge/out/agg_nwm_retro.rds.ind',
               nwm_forecast_ind = '2_munge/out/agg_nwm_long1.rds.ind',
               remake_file = '3_forecast.yml')
@@ -92,6 +93,6 @@ fig_input_data <- function(fig_ind, input_example_yml, preds_ind, remake_file, c
   # grid.draw(g)
 
   fig_file <- as_data_file(fig_ind)
-  png(fig_file); grid::grid.draw(g); dev.off()
+  png(fig_file, width = 10, height = 7, units = 'in',res = 600); grid::grid.draw(g); dev.off()
   gd_put(remote_ind=fig_ind, local_source=fig_file, config_file=config_file)
 }
