@@ -1,11 +1,11 @@
 version: 0.3.0
 name: 3_forecast/log/3_forecast_tasks.ind
 type: file
-hash: 2082c57dc9e67ac11670ff778865e418
-time: 2018-05-17 23:25:30 UTC
+hash: a1e7a9c95dadf60427f19d46d6dce3d9
+time: 2018-06-07 14:59:20 UTC
 depends:
-  forecast_plan: 23bdef57ad5beb6a0deb5e67e1d6e500
-  3_forecast_tasks.yml: 93df73fd7358da65a5c814cef1710bc7
+  forecast_plan: bd68b875281d4fe6f8c48dd1728e91b0
+  3_forecast_tasks.yml: 83772271fe347e62af7160b82088720e
 fixed: f61123465914e7d5879ef7ab8065b2e4
 code:
   functions: {}

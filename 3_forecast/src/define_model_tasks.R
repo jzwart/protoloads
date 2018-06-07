@@ -134,5 +134,6 @@ create_forecast_makefile <- function(makefile, task_plan, remake_file) {
       '3_forecast/src/prep_inputs.R',
       '3_forecast/src/apply_loadest.R',
       '3_forecast/src/apply_wrtds.R'),
-    file_extensions=c('ind'))
+    file_extensions=c('ind'),
+    ind_complete=TRUE)
 }
