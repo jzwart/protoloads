@@ -74,7 +74,7 @@ aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_file, gd_co
           input_raw, input_raw$var$streamflow,
           start = c(site_inds[s], 1),
           count = c(1, -1),
-          raw_datavals = TRUE)
+          raw_datavals = FALSE) # F means apply the scaleFactor
       )
     }))
   } else if(is_analysis || is_forecast) {
@@ -90,7 +90,7 @@ aggregate_nwm <- function(ind_file, raw_ind_file, remake_file, sites_file, gd_co
             input_raw, input_raw$var$streamflow,
             start = c(site_inds[s], 1, r),
             count = c(1, -1, 1),
-            raw_datavals = TRUE)
+            raw_datavals = FALSE) # F means apply the scaleFactor
         )
       }))
     }))
