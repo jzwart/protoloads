@@ -91,6 +91,7 @@ targets:
   9_report/out/fig_preds_v_obs.png.ind:
     command: fig_preds_v_obs(
       fig_ind=target_name,
+      config_fig_yml = '9_report/cfg/config_fig.yml',
       loadest_preds_ind='3_forecast/out/preds_loadest.rds.ind',
       wrtds_preds_ind = '3_forecast/out/preds_wrtds.rds.ind',
       agg_nwis_ind='2_munge/out/agg_nwis.rds.ind',

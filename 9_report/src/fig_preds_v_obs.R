@@ -1,4 +1,7 @@
-fig_preds_v_obs <- function(fig_ind, loadest_preds_ind, wrtds_preds_ind, agg_nwis_ind, remake_file, config_file){
+fig_preds_v_obs <- function(fig_ind, config_fig_yml, loadest_preds_ind, wrtds_preds_ind, agg_nwis_ind, remake_file, config_file){
+  # read in figure scheme config
+  fig_config <- yaml::yaml.load_file(config_fig_yml)
+
   # read in the predictions
   loadest_preds_df <- readRDS(sc_retrieve(loadest_preds_ind, remake_file)) %>%
     select('Date','Flux','ref_date','Site','model_range')
@@ -13,35 +16,51 @@ fig_preds_v_obs <- function(fig_ind, loadest_preds_ind, wrtds_preds_ind, agg_nwi
     rename(site=site_no) %>%
     select('site', 'date', 'daily_mean_flux')
 
+  LeadTimes = c(0,1) # number of leadtimes we want to plot
+
   # join predictions and obs together
   preds_obs <- left_join(loadest_preds_df, wrtds_preds_df, by = c('Date', 'ref_date', 'Site', 'model_range'), suffix = c('_loadest', '_wrtds')) %>%
     gather(key = 'flux_model', value = 'pred_flux', starts_with('Flux')) %>%
     mutate(LeadTime = as.numeric(Date - ref_date, unit = 'days')) %>%
     left_join(y = agg_nwis$flux, by = c('Site' = 'site', 'Date' = 'date')) %>%
-    dplyr::filter(!is.na(daily_mean_flux), !is.na(pred_flux)) %>%
+    dplyr::filter(!is.na(daily_mean_flux), !is.na(pred_flux),
+                  LeadTime %in% LeadTimes) %>%
     rename(obs_flux = daily_mean_flux)
 
+  # creating dummy data frame for making same axis ranges for facet_wrap
+  dummy <- preds_obs %>%
+    group_by(Site) %>%
+    summarise(x_min = min(min(obs_flux),min(pred_flux)), x_max = max(max(obs_flux),max(pred_flux)),
+              y_min = min(min(obs_flux),min(pred_flux)), y_max = max(max(obs_flux),max(pred_flux))) %>%
+    ungroup() %>%
+    gather('x', 'x_val', starts_with('x')) %>%
+    gather('y', 'y_val', starts_with('y')) %>%
+    mutate(flux_model = 'Flux_loadest')
 
   # create the plot
   g <- ggplot(preds_obs, aes(x = obs_flux/1000, y = pred_flux/1000, color = flux_model)) +
     geom_point() +
-    geom_abline(slope = 1, intercept = 0) +
+    geom_blank(data = dummy, aes(x= x_val/1000, y = y_val/1000)) +
+    theme(legend.title = element_blank(),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.background = element_blank(),
+          axis.line = element_line(colour = "black"),
+          legend.position = c(.92,.6),
+          legend.key = element_blank(),
+          strip.background = element_blank()) +
+    scale_color_manual(values = c('Flux_loadest' = fig_config$load_model$loadest,
+                                  'Flux_wrtds' = fig_config$load_model$wrtds),
+                       labels = c('Loadest', 'WRTDS')) +
+    geom_abline(slope = 1, intercept = 0, linetype = 'dashed') +
     facet_wrap(~Site, scales='free', nrow = 3, ncol = 1,
                strip.position = 'right') +
-    xlab('Observed Flux') +
-    ylab('Predicted Flux') +
-    theme(legend.title = element_blank()) +
-    theme_classic()
+    xlab(expression(Observed~nitrate~flux~(Mg~N~day^-1))) +
+    ylab(expression(Predicted~nitrate~flux~(Mg~N~day^-1)))
   g
-
-
-    scale_color_continuous('Lead Time (d)') +
-    xlab('Date') +
-    ylab(expression('Flux'~(Mg~'N-NO'[3]~d^{-1}))) +
-    theme_classic()
 
   # save and post to Drive
   fig_file <- as_data_file(fig_ind)
-  ggsave(fig_file, plot=g, width=6, height=5)
+  ggsave(fig_file, plot=g, width=4, height=10)
   gd_put(remote_ind=fig_ind, local_source=fig_file, config_file=config_file)
 }
