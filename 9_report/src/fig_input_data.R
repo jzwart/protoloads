@@ -14,6 +14,7 @@ fig_input_data <- function(fig_ind, input_example_yml, preds_ind, remake_file, c
               ref_date = input_ex$ref_date,
               site_info_ind = '1_data/out/site_info.tsv.ind',
               nwis_data_ind = '2_munge/out/agg_nwis.rds.ind',
+              nwm_ana_ind = '2_munge/out/agg_nwm_ana.rds.ind',
               nwm_retro_ind = '2_munge/out/agg_nwm_retro.rds.ind',
               nwm_forecast_ind = '2_munge/out/agg_nwm_long1.rds.ind',
               remake_file = '3_forecast.yml')
