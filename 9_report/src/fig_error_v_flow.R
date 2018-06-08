@@ -1,4 +1,6 @@
-fig_error_v_flow <- function(fig_ind, preds_ind, agg_nwis_ind, remake_file, config_file) {
+fig_error_v_flow <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_ind, remake_file, config_file) {
+  # read in figure scheme config
+  fig_config <- yaml::yaml.load_file(config_fig_yml)
 
   # predictions
   preds_df <- readRDS(sc_retrieve(preds_ind, remake_file)) %>%
@@ -38,9 +40,9 @@ fig_error_v_flow <- function(fig_ind, preds_ind, agg_nwis_ind, remake_file, conf
                      geom_boxplot(outlier.shape = NA,
                                   width = 0.7) +
                      scale_fill_manual(name = 'flow_class',
-                       values = c('high' = 'lightblue',
-                                  'med' = 'lightgreen',
-                                  'low' = 'orange'),
+                       values = c('high' = fig_config$flow_class$high,
+                                  'med' = fig_config$flow_class$med,
+                                  'low' = fig_config$flow_class$low),
                        labels = c('High Flow', 'Medium Flow', 'Low Flow')) +
                      theme_classic()+
                      ylim(boxplot.stats(error_df$std_flux_error[error_df$site==sites[1]])$stats[c(1,5)]) +
@@ -61,9 +63,9 @@ fig_error_v_flow <- function(fig_ind, preds_ind, agg_nwis_ind, remake_file, conf
                      geom_boxplot(outlier.shape = NA,
                                   width = 0.7) +
                      scale_fill_manual(name = 'flow_class',
-                                       values = c('high' = 'lightblue',
-                                                  'med' = 'lightgreen',
-                                                  'low' = 'orange'),
+                                       values = c('high' = fig_config$flow_class$high,
+                                                  'med' = fig_config$flow_class$med,
+                                                  'low' = fig_config$flow_class$low),
                                        labels = c(expression('High Flow '('>75'^'th')),
                                                   expression('Medium Flow '('25'^'th'-'75'^'th')),
                                                   expression('Low Flow '('<25'^'th')))) +
@@ -88,9 +90,9 @@ fig_error_v_flow <- function(fig_ind, preds_ind, agg_nwis_ind, remake_file, conf
                      geom_boxplot(outlier.shape = NA,
                                   width = 0.7) +
                      scale_fill_manual(name = 'flow_class',
-                                       values = c('high' = 'lightblue',
-                                                  'med' = 'lightgreen',
-                                                  'low' = 'orange'),
+                                       values = c('high' = fig_config$flow_class$high,
+                                                  'med' = fig_config$flow_class$med,
+                                                  'low' = fig_config$flow_class$low),
                                        labels = c('High Flow', 'Medium Flow', 'Low Flow')) +
                      theme_classic()+
                      ylim(boxplot.stats(error_df$std_flux_error[error_df$site==sites[3]])$stats[c(1,5)]) +

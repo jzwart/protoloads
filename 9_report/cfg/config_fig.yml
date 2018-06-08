@@ -3,10 +3,15 @@ flow_class:
   med: 'lightgreen'
   low: 'orange'
 
-model_range:
-  long1: 'lightblue'
-  med: 'orange'
+forecast_range:
+  long1: 'yellow1'
+  med: 'lightpink'
 
 load_model:
-  loadest: 'lightblue'
-  wrtds: 'orange'
+  loadest: 'darkgoldenrod1'
+  wrtds: 'cyan3'
+
+model_type:
+  retro: 'black'
+  forecast: 'red'
+

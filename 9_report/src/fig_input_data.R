@@ -1,5 +1,7 @@
-fig_input_data <- function(fig_ind, input_example_yml, preds_ind, remake_file, config_file){
+fig_input_data <- function(fig_ind, config_fig_yml, input_example_yml, preds_ind, remake_file, config_file){
   #discharge, concentration, loads
+  # read in figure scheme config
+  fig_config <- yaml::yaml.load_file(config_fig_yml)
 
   input_ex <- yaml::yaml.load_file(input_example_yml)
 
@@ -44,8 +46,8 @@ fig_input_data <- function(fig_ind, input_example_yml, preds_ind, remake_file, c
                      geom_line(size = 1,
                                aes(color = factor(data))) +
                      scale_color_manual(name = 'data',
-                                        values = c('nwis' = 'black',
-                                                   'forecast' = 'red'),
+                                        values = c('nwis' = fig_config$model_type$retro,
+                                                   'forecast' = fig_config$model_type$forecast),
                                         labels = c('Forecast','Retrospective')) +
                      theme_classic() +
                      xlim(xlim) +
@@ -61,9 +63,9 @@ fig_input_data <- function(fig_ind, input_example_yml, preds_ind, remake_file, c
                      geom_point(size = 1,
                                 aes(colour = factor(Uncen))) +
                      scale_color_manual(name = 'Uncen',
-                                        values = c('1' = 'black',
+                                        values = c('1' = fig_config$model_type$retro,
                                                    '0' = 'grey',
-                                                   '2' = 'red'),
+                                                   '2' = fig_config$model_type$forecast),
                                         labels = c('Censored', 'Retrospective', 'Forecast')) +
                      theme_classic()+
                      xlim(xlim) +
@@ -78,8 +80,8 @@ fig_input_data <- function(fig_ind, input_example_yml, preds_ind, remake_file, c
                      geom_point(size = 1,
                                aes(colour = factor(data))) +
                      scale_color_manual(name = 'data',
-                                        values = c('nwis' = 'black',
-                                                   'forecast' = 'red'),
+                                        values = c('nwis' = fig_config$model_type$retro,
+                                                   'forecast' = fig_config$model_type$forecast),
                                         labels = c('Forecast', 'Retrospective')) +
                      theme_classic() +
                      labs(y = expression(Nitrate~flux~(Mg~N~day^-1))) +

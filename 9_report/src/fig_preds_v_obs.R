@@ -46,7 +46,7 @@ fig_preds_v_obs <- function(fig_ind, config_fig_yml, loadest_preds_ind, wrtds_pr
           panel.grid.minor = element_blank(),
           panel.background = element_blank(),
           axis.line = element_line(colour = "black"),
-          legend.position = c(.92,.6),
+          legend.position = c(.2,.95),
           legend.key = element_blank(),
           strip.background = element_blank()) +
     scale_color_manual(values = c('Flux_loadest' = fig_config$load_model$loadest,
