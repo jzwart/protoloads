@@ -1,0 +1,17 @@
+flow_class:
+  high: 'lightblue'
+  med: 'lightgreen'
+  low: 'orange'
+
+forecast_range:
+  long1: 'yellow1'
+  med: 'lightpink'
+
+load_model:
+  loadest: 'darkgoldenrod1'
+  wrtds: 'cyan3'
+
+model_type:
+  retro: 'black'
+  forecast: 'red'
+

@@ -14,6 +14,7 @@ sources:
   - 9_report/src/fig_input_data.R
   - 9_report/src/fig_error_v_leadtime.R
   - 9_report/src/fig_error_v_flow.R
+  - 9_report/src/fig_preds_v_obs.R
   - 3_forecast/src/prep_inputs.R
 
 targets:
@@ -25,6 +26,7 @@ targets:
       - 9_report/out/fig_input_data.png
       - 9_report/out/fig_error_v_leadtime.png
       - 9_report/out/fig_error_v_flow.png
+      - 9_report/out/fig_preds_v_obs.png
 
   # Targets prepared in earlier steps and yml files
   1_data/out/site_info.tsv:
@@ -40,15 +42,18 @@ targets:
   9_report/out/fig_preds_v_time_loadest.png.ind:
     command: fig_preds_v_time(
       fig_ind=target_name,
+      config_fig_yml = '9_report/cfg/config_fig.yml',
       preds_ind='3_forecast/out/preds_loadest.rds.ind',
       agg_nwis_ind='2_munge/out/agg_nwis.rds.ind',
       remake_file=I('9_report.yml'),
       config_file='lib/cfg/gd_config.yml')
   9_report/out/fig_preds_v_time_loadest.png:
     command: gd_get('9_report/out/fig_preds_v_time_loadest.png.ind', config_file='lib/cfg/gd_config.yml')
+
   9_report/out/fig_preds_v_time_wrtds.png.ind:
     command: fig_preds_v_time(
       fig_ind=target_name,
+      config_fig_yml = '9_report/cfg/config_fig.yml',
       preds_ind='3_forecast/out/preds_wrtds.rds.ind',
       agg_nwis_ind='2_munge/out/agg_nwis.rds.ind',
       remake_file=I('9_report.yml'),
@@ -59,6 +64,7 @@ targets:
   9_report/out/fig_input_data.png.ind:
     command: fig_input_data(
       fig_ind=target_name,
+      config_fig_yml = '9_report/cfg/config_fig.yml',
       input_example_yml = '9_report/cfg/input_data_example.yml',
       preds_ind='3_forecast/out/preds_loadest.rds.ind',
       remake_file=I('9_report.yml'),
@@ -69,6 +75,7 @@ targets:
   9_report/out/fig_error_v_leadtime.png.ind:
     command: fig_error_v_leadtime(
       fig_ind=target_name,
+      config_fig_yml = '9_report/cfg/config_fig.yml',
       preds_ind='3_forecast/out/preds_loadest.rds.ind',
       agg_nwis_ind='2_munge/out/agg_nwis.rds.ind',
       remake_file=I('9_report.yml'),
@@ -79,9 +86,22 @@ targets:
   9_report/out/fig_error_v_flow.png.ind:
     command: fig_error_v_flow(
       fig_ind=target_name,
+      config_fig_yml = '9_report/cfg/config_fig.yml',
       preds_ind='3_forecast/out/preds_loadest.rds.ind',
       agg_nwis_ind='2_munge/out/agg_nwis.rds.ind',
       remake_file=I('9_report.yml'),
       config_file='lib/cfg/gd_config.yml')
   9_report/out/fig_error_v_flow.png:
     command: gd_get('9_report/out/fig_error_v_flow.png.ind', config_file='lib/cfg/gd_config.yml')
+
+  9_report/out/fig_preds_v_obs.png.ind:
+    command: fig_preds_v_obs(
+      fig_ind=target_name,
+      config_fig_yml = '9_report/cfg/config_fig.yml',
+      loadest_preds_ind='3_forecast/out/preds_loadest.rds.ind',
+      wrtds_preds_ind = '3_forecast/out/preds_wrtds.rds.ind',
+      agg_nwis_ind='2_munge/out/agg_nwis.rds.ind',
+      remake_file=I('9_report.yml'),
+      config_file='lib/cfg/gd_config.yml')
+  9_report/out/fig_preds_v_obs.png:
+    command: gd_get('9_report/out/fig_preds_v_obs.png.ind', config_file='lib/cfg/gd_config.yml')

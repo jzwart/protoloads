@@ -1,4 +1,6 @@
-fig_error_v_leadtime <- function(fig_ind, preds_ind, agg_nwis_ind, remake_file, config_file) {
+fig_error_v_leadtime <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_ind, remake_file, config_file) {
+  # read in figure scheme config
+  fig_config <- yaml::yaml.load_file(config_fig_yml)
 
   # predictions
   preds_df <- readRDS(sc_retrieve(preds_ind, remake_file)) %>%
@@ -30,15 +32,15 @@ fig_error_v_leadtime <- function(fig_ind, preds_ind, agg_nwis_ind, remake_file, 
                      geom_boxplot(outlier.shape = NA,
                                   width = 0.7) +
                      scale_fill_manual(name = 'model_range',
-                       values = c('long1' = 'lightblue',
-                                  'med' = 'orange'),
+                       values = c('long1' = fig_config$forecast_range$long1,
+                                  'med' = fig_config$forecast_range$med),
                        labels = c('Long Range','Medium Range')) +
                      theme_classic()+
                      ylim(boxplot.stats(error_df$std_flux_error[error_df$site==sites[1]])$stats[c(1,5)]) +
                      scale_x_discrete(limits = rev(levels(factor(error_df$LeadTime[error_df$site==sites[1]])))) +
                      theme(axis.title.x = element_blank(),
                            axis.title.y = element_blank(),
-                           legend.position = c(.8,.8),
+                           legend.position = c(.2,.8),
                            legend.title = element_blank(),
                            plot.margin = unit(c(1,3,1,1),'lines'))+
                      annotation_custom(grob = textGrob(label = sites[1], hjust = 0, rot = 270),
@@ -53,8 +55,8 @@ fig_error_v_leadtime <- function(fig_ind, preds_ind, agg_nwis_ind, remake_file, 
                      geom_boxplot(outlier.shape = NA,
                                   width = 0.7) +
                      scale_fill_manual(name = 'model_range',
-                                       values = c('long1' = 'lightblue',
-                                                  'med' = 'orange'),
+                                       values = c('long1' = fig_config$forecast_range$long1,
+                                                  'med' = fig_config$forecast_range$med),
                                        labels = c('Long Range','Medium Range')) +
                      theme_classic()+
                      ylim(boxplot.stats(error_df$std_flux_error[error_df$site==sites[2]])$stats[c(1,5)]) +
@@ -75,8 +77,8 @@ fig_error_v_leadtime <- function(fig_ind, preds_ind, agg_nwis_ind, remake_file, 
                      geom_boxplot(outlier.shape = NA,
                                   width = 0.7) +
                      scale_fill_manual(name = 'model_range',
-                                       values = c('long1' = 'lightblue',
-                                                  'med' = 'orange'),
+                                       values = c('long1' = fig_config$forecast_range$long1,
+                                                  'med' = fig_config$forecast_range$med),
                                        labels = c('Long Range','Medium Range')) +
                      theme_classic()+
                      ylim(boxplot.stats(error_df$std_flux_error[error_df$site==sites[3]])$stats[c(1,5)]) +
