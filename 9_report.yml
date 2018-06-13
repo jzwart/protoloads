@@ -27,6 +27,7 @@ targets:
       - 9_report/out/fig_error_v_leadtime.png
       - 9_report/out/fig_error_v_flow.png
       - 9_report/out/fig_preds_v_obs.png
+      - 9_report/out/fig_exceedance.png
 
   # Targets prepared in earlier steps and yml files
   1_data/out/site_info.tsv:
@@ -105,3 +106,15 @@ targets:
       config_file='lib/cfg/gd_config.yml')
   9_report/out/fig_preds_v_obs.png:
     command: gd_get('9_report/out/fig_preds_v_obs.png.ind', config_file='lib/cfg/gd_config.yml')
+
+  9_report/out/fig_exceedance.png.ind:
+    command: fig_exceedance(
+      fig_ind=target_name,
+      config_fig_yml = '9_report/cfg/config_fig.yml',
+      preds_ind='3_forecast/out/preds_loadest.rds.ind',
+      agg_nwis_ind='2_munge/out/agg_nwis.rds.ind',
+      remake_file=I('9_report.yml'),
+      config_file='lib/cfg/gd_config.yml')
+  9_report/out/fig_exceedance.png:
+    command: gd_get('9_report/out/fig_exceedance.png.ind', config_file='lib/cfg/gd_config.yml')
+

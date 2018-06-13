@@ -40,27 +40,27 @@ fig_preds_v_obs <- function(fig_ind, config_fig_yml, loadest_preds_ind, wrtds_pr
   # create the plot
   g <- ggplot(preds_obs, aes(x = obs_flux/1000, y = pred_flux/1000, color = flux_model)) +
     geom_point() +
-    geom_blank(data = dummy, aes(x= x_val/1000, y = y_val/1000)) +
+    geom_blank(data = dummy, aes(x= x_val/1000, y = y_val/1000)) + # to make 1:1 axes
     theme(legend.title = element_blank(),
           panel.grid.major = element_blank(),
           panel.grid.minor = element_blank(),
           panel.background = element_blank(),
           axis.line = element_line(colour = "black"),
-          legend.position = c(.2,.95),
+          legend.position = c(.05,.90),
           legend.key = element_blank(),
           strip.background = element_blank()) +
     scale_color_manual(values = c('Flux_loadest' = fig_config$load_model$loadest,
                                   'Flux_wrtds' = fig_config$load_model$wrtds),
                        labels = c('Loadest', 'WRTDS')) +
     geom_abline(slope = 1, intercept = 0, linetype = 'dashed') +
-    facet_wrap(~Site, scales='free', nrow = 3, ncol = 1,
-               strip.position = 'right') +
+    facet_wrap(~Site, scales='free', nrow = 1, ncol = 3,
+               strip.position = 'top') +
     xlab(expression(Observed~nitrate~flux~(Mg~N~day^-1))) +
     ylab(expression(Predicted~nitrate~flux~(Mg~N~day^-1)))
-  g
+  # g
 
   # save and post to Drive
   fig_file <- as_data_file(fig_ind)
-  ggsave(fig_file, plot=g, width=4, height=10)
+  ggsave(fig_file, plot=g, width=10, height=4)
   gd_put(remote_ind=fig_ind, local_source=fig_file, config_file=config_file)
 }
