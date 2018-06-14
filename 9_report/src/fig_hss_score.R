@@ -37,72 +37,6 @@ fig_exceedance <- function(fig_ind, config_fig_yml, exceed_cfg_yml, preds_ind, a
     mutate(prob_exceed = sum(pred_exceeded == 'yes')/n()) %>%
     ungroup()
 
-    # probability of exceeding is counting how many times forecasts exceeded threshold / number of forecasts
-
-  # create the plot
-  # g <- ggplot(dplyr::filter(cumulative_freq, site == '07374000'), aes(x = daily_mean_flux/1000, y = freq, color = exceeded)) +
-  #   geom_line(size = 1.2) +
-  #   theme(legend.title = element_blank(),
-  #         panel.grid.major = element_blank(),
-  #         panel.grid.minor = element_blank(),
-  #         panel.background = element_blank(),
-  #         axis.line = element_line(colour = "black"),
-  #         legend.position = c(.15,.90),
-  #         legend.key = element_blank(),
-  #         strip.background = element_blank()) +
-  #   scale_color_manual(values = c('no' = 'black',
-  #                                 'yes' = 'red'),
-  #                      labels = c('Below','Exceeded')) +
-  #   facet_wrap(~site, scales='free_x', nrow = 1, ncol = 3,
-  #              strip.position = 'top') +
-  #   xlab(expression(Observed~nitrate~flux~(Mg~N~day^-1))) +
-  #   ylab(expression(Cumulative~Frequency)) +
-  #   geom_vline(aes(xintercept=flux_threshold), color='red', linetype= 'dashed', dplyr::filter(exceed_thresh, site =='07374000')) # adding threshold
-  #
-  # g
-
-  g <- ggplot(dplyr::filter(prob_exceed, site == '07374000'), aes(x = daily_mean_flux/1000, y = prob_exceed)) +
-    geom_line(size = 1.2) +
-    theme(legend.title = element_blank(),
-          panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank(),
-          panel.background = element_blank(),
-          axis.line = element_line(colour = "black"),
-          legend.position = c(.15,.90),
-          legend.key = element_blank(),
-          strip.background = element_blank()) +
-    # scale_color_manual(values = c('no' = 'black',
-    #                               'yes' = 'red'),
-    #                    labels = c('Below','Exceeded')) +
-    facet_wrap(~site, scales='free_x', nrow = 1, ncol = 3,
-               strip.position = 'top') +
-    xlab(expression(Observed~nitrate~flux~(Mg~N~day^-1))) +
-    ylab(expression(Probability~of~threshold~exceedance)) +
-    geom_vline(aes(xintercept=flux_threshold), color='red', size = 1.3, linetype= 'dashed', dplyr::filter(exceed_thresh, site =='07374000')) # adding threshold
-
-  # g
-  #
-  # g <- ggplot(prob_exceed, aes(x = daily_mean_flux/1000, y = prob_exceed)) +
-  #   geom_line(size = 1.2) +
-  #   theme(legend.title = element_blank(),
-  #         panel.grid.major = element_blank(),
-  #         panel.grid.minor = element_blank(),
-  #         panel.background = element_blank(),
-  #         axis.line = element_line(colour = "black"),
-  #         legend.position = c(.15,.90),
-  #         legend.key = element_blank(),
-  #         strip.background = element_blank()) +
-  #   # scale_color_manual(values = c('no' = 'black',
-  #   #                               'yes' = 'red'),
-  #   #                    labels = c('Below','Exceeded')) +
-  #   facet_wrap(~site, scales='free_x', nrow = 1, ncol = 3,
-  #              strip.position = 'top') +
-  #   xlab(expression(Observed~nitrate~flux~(Mg~N~day^-1))) +
-  #   ylab(expression(Cumulative~Frequency)) +
-  #   geom_vline(aes(xintercept=flux_threshold), color='red', linetype= 'dashed', exceed_thresh) # adding threshold
-  #
-  # g
-
   # Heidke Skill Score http://www.eumetrain.org/data/4/451/english/msg/ver_categ_forec/uos3/uos3_ko1.htm
 
   # The Heidke Skill score is in the usual skill score format,
@@ -128,15 +62,26 @@ fig_exceedance <- function(fig_ind, config_fig_yml, exceed_cfg_yml, preds_ind, a
                    (sum(hss_code=='a')+sum(hss_code=='b'))*(sum(hss_code=='b')+sum(hss_code=='d')))) %>%
     ungroup()
 
-  sites = unique(hss$site)
-
-  # hss fig
-  ggplot(hss, aes(x=factor(LeadTime), y=hss, color= model_range)) +
-    geom_point() +
-    theme_classic()+
-    facet_wrap(~site,nrow = 3)
-
-
+  # create the plot
+  g <- ggplot(hss, aes(x = factor(LeadTime), y = hss, fill = model_range)) +
+    geom_point(position = 'jitter', size =4, shape = 21, stroke = 1.5) +
+    geom_hline(yintercept = 0,
+               linetype = 'dashed') +
+    theme(legend.title = element_blank(),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.background = element_blank(),
+          axis.line = element_line(colour = "black"),
+          legend.position = c(.05,.90),
+          legend.key = element_blank(),
+          strip.background = element_blank()) +
+    scale_fill_manual(values = c('long1' = fig_config$forecast_range$long1,
+                                  'med' = fig_config$forecast_range$med),
+                       labels = c('Long Range', 'Medium Range')) +
+    facet_wrap(~site, scales='fixed', nrow = 1, ncol = 3,
+               strip.position = 'top') +
+    xlab(expression(Lead~Time~(days))) +
+    ylab(expression(Heidke~Skill~Score))
 
   # save and post to Drive
   fig_file <- as_data_file(fig_ind)
