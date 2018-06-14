@@ -80,6 +80,7 @@ fig_hss_score <- function(fig_ind, config_fig_yml, exceed_cfg_yml, preds_ind, ag
           legend.key = element_blank(),
           strip.background = element_blank()) +
     scale_x_reverse(breaks = c(0,9,19,29))+
+    annotate("segment", x=Inf, xend=Inf, y=-Inf, yend=Inf, size = 1.1)+
     scale_fill_manual(values = c('long1' = fig_config$forecast_range$long1,
                                   'med' = fig_config$forecast_range$med),
                        labels = c('Long Range', 'Medium Range')) +

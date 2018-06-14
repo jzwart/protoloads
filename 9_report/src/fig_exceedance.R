@@ -39,107 +39,31 @@ fig_exceedance <- function(fig_ind, config_fig_yml, exceed_cfg_yml, preds_ind, a
 
     # probability of exceeding is counting how many times forecasts exceeded threshold / number of forecasts
 
-  # create the plot
-  # g <- ggplot(dplyr::filter(cumulative_freq, site == '07374000'), aes(x = daily_mean_flux/1000, y = freq, color = exceeded)) +
-  #   geom_line(size = 1.2) +
-  #   theme(legend.title = element_blank(),
-  #         panel.grid.major = element_blank(),
-  #         panel.grid.minor = element_blank(),
-  #         panel.background = element_blank(),
-  #         axis.line = element_line(colour = "black"),
-  #         legend.position = c(.15,.90),
-  #         legend.key = element_blank(),
-  #         strip.background = element_blank()) +
-  #   scale_color_manual(values = c('no' = 'black',
-  #                                 'yes' = 'red'),
-  #                      labels = c('Below','Exceeded')) +
-  #   facet_wrap(~site, scales='free_x', nrow = 1, ncol = 3,
-  #              strip.position = 'top') +
-  #   xlab(expression(Observed~nitrate~flux~(Mg~N~day^-1))) +
-  #   ylab(expression(Cumulative~Frequency)) +
-  #   geom_vline(aes(xintercept=flux_threshold), color='red', linetype= 'dashed', dplyr::filter(exceed_thresh, site =='07374000')) # adding threshold
-  #
-  # g
-
-  g <- ggplot(dplyr::filter(prob_exceed, site == '07374000'), aes(x = daily_mean_flux/1000, y = prob_exceed)) +
+  g <- ggplot(prob_exceed, aes(x = daily_mean_flux/1000, y = prob_exceed)) +
     geom_line(size = 1.2) +
     theme(legend.title = element_blank(),
           panel.grid.major = element_blank(),
           panel.grid.minor = element_blank(),
           panel.background = element_blank(),
+          axis.text = element_text(size = 15),
+          strip.text = element_text(size = 15),
+          axis.title = element_text(size = 15),
           axis.line = element_line(colour = "black"),
           legend.position = c(.15,.90),
           legend.key = element_blank(),
           strip.background = element_blank()) +
-    # scale_color_manual(values = c('no' = 'black',
-    #                               'yes' = 'red'),
-    #                    labels = c('Below','Exceeded')) +
     facet_wrap(~site, scales='free_x', nrow = 1, ncol = 3,
                strip.position = 'top') +
     xlab(expression(Observed~nitrate~flux~(Mg~N~day^-1))) +
-    ylab(expression(Probability~of~threshold~exceedance)) +
-    geom_vline(aes(xintercept=flux_threshold), color='red', size = 1.3, linetype= 'dashed', dplyr::filter(exceed_thresh, site =='07374000')) # adding threshold
-
-  # g
-  #
-  # g <- ggplot(prob_exceed, aes(x = daily_mean_flux/1000, y = prob_exceed)) +
-  #   geom_line(size = 1.2) +
-  #   theme(legend.title = element_blank(),
-  #         panel.grid.major = element_blank(),
-  #         panel.grid.minor = element_blank(),
-  #         panel.background = element_blank(),
-  #         axis.line = element_line(colour = "black"),
-  #         legend.position = c(.15,.90),
-  #         legend.key = element_blank(),
-  #         strip.background = element_blank()) +
-  #   # scale_color_manual(values = c('no' = 'black',
-  #   #                               'yes' = 'red'),
-  #   #                    labels = c('Below','Exceeded')) +
-  #   facet_wrap(~site, scales='free_x', nrow = 1, ncol = 3,
-  #              strip.position = 'top') +
-  #   xlab(expression(Observed~nitrate~flux~(Mg~N~day^-1))) +
-  #   ylab(expression(Cumulative~Frequency)) +
-  #   geom_vline(aes(xintercept=flux_threshold), color='red', linetype= 'dashed', exceed_thresh) # adding threshold
-  #
-  # g
-
-  # Heidke Skill Score http://www.eumetrain.org/data/4/451/english/msg/ver_categ_forec/uos3/uos3_ko1.htm
-
-  # The Heidke Skill score is in the usual skill score format,
-  #
-  # Skill = (score value – score for the standard forecast) / (perfect score – score for the standard forecast)
-  #
-  # For the HSS, the "score" is the number correct or the proportion correct. The "standard forecast" is usually the number correct by chance or the proportion correct by chance. Thus using the proportion correct,
-  #
-  # HSS = {(a+d)/n – [(a+b)(a+c)+(b+d)(c+d)]/n 2 }/{1 – [(a+b)(a+c) +(b+d)(c+d)]/n 2 }
-  # which is simplified to:
-  # HSS = 2(ad-bc)/[(a+c)(c+d) + (a+b)(b+d)]
-  # The HSS measures the fractional improvement of the forecast over the standard forecast. Like most skill scores, it is normalized by the total range of possible improvement over the standard, which means Heidke Skill scores can safely be compared on different datasets. The range of the HSS is -∞ to 1. Negative values indicate that the chance forecast is better, 0 means no skill, and a perfect forecast obtains a HSS of 1.
-  #  where a = yes_exceeded_obs + yes_exceeded_pred, b = no_exceeded_obs + yes_exceeded_pred, c = yes_exceeded_obs + no_exceeded_pred, d = no_exceeded_obs + no_exceeded_pred, n = a+b+c+d or count
-
-  hss = prob_exceed %>%
-    mutate(hss_code = case_when(obs_exceeded == 'yes' & pred_exceeded == 'yes' ~ 'a',
-                                obs_exceeded == 'no' & pred_exceeded == 'yes' ~ 'b',
-                                obs_exceeded == 'yes' & pred_exceeded == 'no' ~ 'c',
-                                obs_exceeded == 'no' & pred_exceeded == 'no' ~ 'd')) %>%
-    group_by(site, LeadTime, model_range) %>%
-    summarise(hss = 2*(sum(hss_code=='a')*sum(hss_code=='d')-sum(hss_code=='b')*sum(hss_code=='c'))/
-                ((sum(hss_code=='a')+sum(hss_code=='c'))*(sum(hss_code=='c')+sum(hss_code=='d'))+
-                   (sum(hss_code=='a')+sum(hss_code=='b'))*(sum(hss_code=='b')+sum(hss_code=='d')))) %>%
-    ungroup()
-
-  sites = unique(hss$site)
-
-  # hss fig
-  ggplot(hss, aes(x=factor(LeadTime), y=hss, color= model_range)) +
-    geom_point() +
-    theme_classic()+
-    facet_wrap(~site,nrow = 3)
-
-
+    ylab(expression(Fraction~of~Forecasts~Exceeding~Threshold)) +
+    annotate("segment", x=-Inf, xend=-Inf, y=-Inf, yend=Inf, size = 1.1)+
+    geom_vline(aes(xintercept=flux_threshold),
+               color='red',
+               size = 1.3,
+               linetype= 'dashed', exceed_thresh) # adding threshold
 
   # save and post to Drive
   fig_file <- as_data_file(fig_ind)
-  png(fig_file, width = 7, height = 7, units = 'in',res = 600); grid::grid.draw(g); dev.off()
+  ggsave(fig_file, plot=g, width=14, height=5)
   gd_put(remote_ind=fig_ind, local_source=fig_file, config_file=config_file)
 }
