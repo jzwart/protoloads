@@ -45,6 +45,10 @@ fig_preds_v_obs <- function(fig_ind, config_fig_yml, loadest_preds_ind, wrtds_pr
           panel.grid.major = element_blank(),
           panel.grid.minor = element_blank(),
           panel.background = element_blank(),
+          axis.text = element_text(size = 15),
+          strip.text = element_text(size = 15),
+          axis.title = element_text(size = 15),
+          legend.text = element_text(size = 12),
           axis.line = element_line(colour = "black"),
           legend.position = c(.05,.90),
           legend.key = element_blank(),
@@ -61,6 +65,6 @@ fig_preds_v_obs <- function(fig_ind, config_fig_yml, loadest_preds_ind, wrtds_pr
 
   # save and post to Drive
   fig_file <- as_data_file(fig_ind)
-  ggsave(fig_file, plot=g, width=10, height=4)
+  ggsave(fig_file, plot=g, width=14, height=5)
   gd_put(remote_ind=fig_ind, local_source=fig_file, config_file=config_file)
 }
