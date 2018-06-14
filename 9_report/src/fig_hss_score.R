@@ -1,4 +1,4 @@
-fig_exceedance <- function(fig_ind, config_fig_yml, exceed_cfg_yml, preds_ind, agg_nwis_ind, remake_file, config_file) {
+fig_hss_score <- function(fig_ind, config_fig_yml, exceed_cfg_yml, preds_ind, agg_nwis_ind, remake_file, config_file) {
   # read in figure scheme config
   fig_config <- yaml::yaml.load_file(config_fig_yml)
 
@@ -63,7 +63,7 @@ fig_exceedance <- function(fig_ind, config_fig_yml, exceed_cfg_yml, preds_ind, a
     ungroup()
 
   # create the plot
-  g <- ggplot(hss, aes(x = factor(LeadTime), y = hss, fill = model_range)) +
+  g <- ggplot(hss, aes(x = LeadTime, y = hss, fill = model_range)) +
     geom_point(position = 'jitter', size =4, shape = 21, stroke = 1.5) +
     geom_hline(yintercept = 0,
                linetype = 'dashed') +
@@ -72,19 +72,24 @@ fig_exceedance <- function(fig_ind, config_fig_yml, exceed_cfg_yml, preds_ind, a
           panel.grid.minor = element_blank(),
           panel.background = element_blank(),
           axis.line = element_line(colour = "black"),
-          legend.position = c(.05,.90),
+          axis.text = element_text(size = 15),
+          strip.text = element_text(size = 15),
+          axis.title = element_text(size = 15),
+          legend.text = element_text(size = 12),
+          legend.position = c(.1,.85),
           legend.key = element_blank(),
           strip.background = element_blank()) +
+    scale_x_reverse(breaks = c(0,9,19,29))+
     scale_fill_manual(values = c('long1' = fig_config$forecast_range$long1,
                                   'med' = fig_config$forecast_range$med),
                        labels = c('Long Range', 'Medium Range')) +
     facet_wrap(~site, scales='fixed', nrow = 1, ncol = 3,
                strip.position = 'top') +
     xlab(expression(Lead~Time~(days))) +
-    ylab(expression(Heidke~Skill~Score))
+    ylab(expression(Forecasting~Skill~(Heidke~Skill~Score)))
 
   # save and post to Drive
   fig_file <- as_data_file(fig_ind)
-  png(fig_file, width = 7, height = 7, units = 'in',res = 600); grid::grid.draw(g); dev.off()
+  ggsave(fig_file, plot=g, width=14, height=5)
   gd_put(remote_ind=fig_ind, local_source=fig_file, config_file=config_file)
 }
