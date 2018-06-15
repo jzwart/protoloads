@@ -121,11 +121,8 @@ fig_error_v_flow <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_ind, r
   g$widths <- grid::unit.pmax(g1$widths, g2$widths, g3$widths)
   g$layout$clip[g$layout$name=='panel'] <- 'off' # so site labels don't get cut off
 
-  # windows()
-  # grid.draw(g)
-
   # save and post to Drive
   fig_file <- as_data_file(fig_ind)
-  png(fig_file, width = 10, height = 7, units = 'in',res = 300); grid::grid.draw(g); dev.off()
+  png(fig_file, width = 12, height = 6, units = 'in',res = 300); grid::grid.draw(g); dev.off()
   gd_put(remote_ind=fig_ind, local_source=fig_file, config_file=config_file)
 }

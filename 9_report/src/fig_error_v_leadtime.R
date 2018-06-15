@@ -112,6 +112,6 @@ fig_error_v_leadtime <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_in
 
   # save and post to Drive
   fig_file <- as_data_file(fig_ind)
-  png(fig_file, width = 10, height = 7, units = 'in',res = 300); grid::grid.draw(g); dev.off()
+  png(fig_file, width = 12, height = 6, units = 'in',res = 300); grid::grid.draw(g); dev.off()
   gd_put(remote_ind=fig_ind, local_source=fig_file, config_file=config_file)
 }

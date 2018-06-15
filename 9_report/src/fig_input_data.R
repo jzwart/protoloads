@@ -51,7 +51,7 @@ fig_input_data <- function(fig_ind, config_fig_yml, input_example_yml, preds_ind
                                         labels = c('Forecast','Retrospective')) +
                      theme_classic() +
                      xlim(xlim) +
-                     labs(y = expression(Discharge~(m^3~s^-1))) +
+                     labs(y = expression(atop('Discharge',(m^3~s^-1)))) +
                      theme(axis.title.x = element_blank(),
                            legend.position = c(.1,.9),
                            axis.text = element_text(size = 15),
@@ -74,14 +74,14 @@ fig_input_data <- function(fig_ind, config_fig_yml, input_example_yml, preds_ind
                                         labels = c('Censored', 'Retrospective', 'Forecast')) +
                      theme_classic()+
                      xlim(xlim) +
-                     labs(y = expression(Nitrate~concentration~(mg~N~L^-1))) +
+                     labs(y = expression(atop('Nitrate concentration',(mg~N~L^-1)))) +
                      theme(axis.title.x = element_blank(),
                            axis.text = element_text(size = 15),
                            axis.text.x = element_blank(),
                            strip.text = element_text(size = 15),
                            axis.title = element_text(size = 12),
                            legend.text = element_text(size =10),
-                           legend.position = c(.1,.85), legend.title = element_blank()) +
+                           legend.position = c(.1,.80), legend.title = element_blank()) +
                      geom_vline(xintercept = as.Date(input_ex$ref_date), linetype = 'dashed'))
 
   #loads
@@ -94,7 +94,7 @@ fig_input_data <- function(fig_ind, config_fig_yml, input_example_yml, preds_ind
                                                    'forecast' = fig_config$model_type$forecast),
                                         labels = c('Forecast', 'Retrospective')) +
                      theme_classic() +
-                     labs(y = expression(Nitrate~flux~(Mg~N~day^-1))) +
+                     labs(y = expression(atop('Nitrate flux',(Mg~N~day^-1)))) +
                      theme(legend.position = c(.1,.9),
                            axis.text = element_text(size = 15),
                            strip.text = element_text(size = 15),
@@ -109,6 +109,6 @@ fig_input_data <- function(fig_ind, config_fig_yml, input_example_yml, preds_ind
   # grid.draw(g)
 
   fig_file <- as_data_file(fig_ind)
-  png(fig_file, width = 10, height = 7, units = 'in',res = 300); grid::grid.draw(g); dev.off()
+  png(fig_file, width = 12, height = 6, units = 'in',res = 300); grid::grid.draw(g); dev.off()
   gd_put(remote_ind=fig_ind, local_source=fig_file, config_file=config_file)
 }

@@ -51,7 +51,7 @@ fig_hss_score <- function(fig_ind, config_fig_yml, exceed_cfg_yml, preds_ind, ag
   # The HSS measures the fractional improvement of the forecast over the standard forecast. Like most skill scores, it is normalized by the total range of possible improvement over the standard, which means Heidke Skill scores can safely be compared on different datasets. The range of the HSS is -∞ to 1. Negative values indicate that the chance forecast is better, 0 means no skill, and a perfect forecast obtains a HSS of 1.
   #  where a = yes_exceeded_obs + yes_exceeded_pred, b = no_exceeded_obs + yes_exceeded_pred, c = yes_exceeded_obs + no_exceeded_pred, d = no_exceeded_obs + no_exceeded_pred, n = a+b+c+d or count
 
-  hss = prob_exceed %>%
+  hss <- prob_exceed %>%
     mutate(hss_code = case_when(obs_exceeded == 'yes' & pred_exceeded == 'yes' ~ 'a',
                                 obs_exceeded == 'no' & pred_exceeded == 'yes' ~ 'b',
                                 obs_exceeded == 'yes' & pred_exceeded == 'no' ~ 'c',
@@ -60,6 +60,17 @@ fig_hss_score <- function(fig_ind, config_fig_yml, exceed_cfg_yml, preds_ind, ag
     summarise(hss = 2*(sum(hss_code=='a')*sum(hss_code=='d')-sum(hss_code=='b')*sum(hss_code=='c'))/
                 ((sum(hss_code=='a')+sum(hss_code=='c'))*(sum(hss_code=='c')+sum(hss_code=='d'))+
                    (sum(hss_code=='a')+sum(hss_code=='b'))*(sum(hss_code=='b')+sum(hss_code=='d')))) %>%
+    ungroup()
+
+  cont_table <- prob_exceed %>%
+    mutate(hss_code = case_when(obs_exceeded == 'yes' & pred_exceeded == 'yes' ~ 'a',
+                                obs_exceeded == 'no' & pred_exceeded == 'yes' ~ 'b',
+                                obs_exceeded == 'yes' & pred_exceeded == 'no' ~ 'c',
+                                obs_exceeded == 'no' & pred_exceeded == 'no' ~ 'd')) %>%
+    group_by(site, LeadTime, model_range) %>%
+    summarise(correct = sum(sum(hss_code=='a'),sum(hss_code=='d')),
+              false_positive = sum(hss_code == 'b'),
+              false_negative = sum(hss_code == 'c'))%>%
     ungroup()
 
   # create the plot
