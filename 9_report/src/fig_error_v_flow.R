@@ -49,6 +49,9 @@ fig_error_v_flow <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_ind, r
                      scale_x_discrete(limits = rev(levels(factor(error_df$LeadTime[error_df$site==sites[1]])))) +
                      theme(axis.title.x = element_blank(),
                            axis.title.y = element_blank(),
+                           axis.text = element_text(size = 15),
+                           strip.text = element_text(size = 15),
+                           axis.title = element_text(size = 15),
                            legend.position = 'none',
                            plot.margin = unit(c(1,3,1,1),'lines'))+
                      annotation_custom(grob = textGrob(label = sites[1], hjust = 0, rot = 270),
@@ -75,6 +78,10 @@ fig_error_v_flow <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_ind, r
                      theme(axis.title.x = element_blank(),
                            legend.position = c(.9,.8),
                            legend.title = element_blank(),
+                           axis.text = element_text(size = 15),
+                           strip.text = element_text(size = 15),
+                           axis.title = element_text(size = 15),
+                           legend.text = element_text(size = 12),
                            legend.text.align = 0,
                            plot.margin = unit(c(1,3,1,1),'lines')) +
                      ylab(expression('Relative flux error'~(('predict - obs')~'/'~'obs')))+
@@ -100,6 +107,9 @@ fig_error_v_flow <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_ind, r
                      xlab('Lead Time (days)') +
                      theme(legend.position = 'none',
                            axis.title.y = element_blank(),
+                           axis.text = element_text(size = 15),
+                           strip.text = element_text(size = 15),
+                           axis.title = element_text(size = 15),
                            plot.margin = unit(c(1,3,1,1),'lines'))+
                      annotation_custom(grob = textGrob(label = sites[3], hjust = 0, rot = 270),
                                        ymin = diff(boxplot.stats(error_df$std_flux_error[error_df$site==sites[3]])$stats[c(1,5)])/2,
@@ -111,11 +121,8 @@ fig_error_v_flow <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_ind, r
   g$widths <- grid::unit.pmax(g1$widths, g2$widths, g3$widths)
   g$layout$clip[g$layout$name=='panel'] <- 'off' # so site labels don't get cut off
 
-  # windows()
-  # grid.draw(g)
-
   # save and post to Drive
   fig_file <- as_data_file(fig_ind)
-  png(fig_file, width = 10, height = 7, units = 'in',res = 600); grid::grid.draw(g); dev.off()
+  png(fig_file, width = 12, height = 6, units = 'in',res = 300); grid::grid.draw(g); dev.off()
   gd_put(remote_ind=fig_ind, local_source=fig_file, config_file=config_file)
 }

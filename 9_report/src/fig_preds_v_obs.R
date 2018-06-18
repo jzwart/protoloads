@@ -27,6 +27,11 @@ fig_preds_v_obs <- function(fig_ind, config_fig_yml, loadest_preds_ind, wrtds_pr
                   LeadTime %in% LeadTimes) %>%
     rename(obs_flux = daily_mean_flux)
 
+  rmse <- preds_obs %>%
+    group_by(Site, flux_model) %>%
+    summarise(rmse = sqrt(mean((obs_flux/1000 - pred_flux/1000)^2))) %>%
+    ungroup()
+
   # creating dummy data frame for making same axis ranges for facet_wrap
   dummy <- preds_obs %>%
     group_by(Site) %>%
@@ -39,28 +44,33 @@ fig_preds_v_obs <- function(fig_ind, config_fig_yml, loadest_preds_ind, wrtds_pr
 
   # create the plot
   g <- ggplot(preds_obs, aes(x = obs_flux/1000, y = pred_flux/1000, color = flux_model)) +
-    geom_point() +
-    geom_blank(data = dummy, aes(x= x_val/1000, y = y_val/1000)) +
+    geom_point(size = 2) +
+    geom_blank(data = dummy, aes(x= x_val/1000, y = y_val/1000)) + # to make 1:1 axes
     theme(legend.title = element_blank(),
           panel.grid.major = element_blank(),
           panel.grid.minor = element_blank(),
           panel.background = element_blank(),
+          axis.text = element_text(size = 15),
+          strip.text = element_text(size = 15),
+          axis.title = element_text(size = 15),
+          legend.text = element_text(size = 12),
           axis.line = element_line(colour = "black"),
-          legend.position = c(.2,.95),
+          legend.position = c(.05,.90),
           legend.key = element_blank(),
-          strip.background = element_blank()) +
+          strip.background = element_blank(),
+          plot.margin = unit(c(.5,1,.5,.5),units = 'cm')) +
     scale_color_manual(values = c('Flux_loadest' = fig_config$load_model$loadest,
                                   'Flux_wrtds' = fig_config$load_model$wrtds),
                        labels = c('Loadest', 'WRTDS')) +
     geom_abline(slope = 1, intercept = 0, linetype = 'dashed') +
-    facet_wrap(~Site, scales='free', nrow = 3, ncol = 1,
-               strip.position = 'right') +
+    facet_wrap(~Site, scales='free', nrow = 1, ncol = 3,
+               strip.position = 'top') +
     xlab(expression(Observed~nitrate~flux~(Mg~N~day^-1))) +
     ylab(expression(Predicted~nitrate~flux~(Mg~N~day^-1)))
-  g
+  # g
 
   # save and post to Drive
   fig_file <- as_data_file(fig_ind)
-  ggsave(fig_file, plot=g, width=4, height=10)
+  ggsave(fig_file, plot=g, width=12, height=5)
   gd_put(remote_ind=fig_ind, local_source=fig_file, config_file=config_file)
 }

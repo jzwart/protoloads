@@ -40,6 +40,10 @@ fig_error_v_leadtime <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_in
                      scale_x_discrete(limits = rev(levels(factor(error_df$LeadTime[error_df$site==sites[1]])))) +
                      theme(axis.title.x = element_blank(),
                            axis.title.y = element_blank(),
+                           axis.text = element_text(size = 15),
+                           strip.text = element_text(size = 15),
+                           axis.title = element_text(size = 15),
+                           legend.text = element_text(size = 12),
                            legend.position = c(.2,.8),
                            legend.title = element_blank(),
                            plot.margin = unit(c(1,3,1,1),'lines'))+
@@ -63,6 +67,9 @@ fig_error_v_leadtime <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_in
                      scale_x_discrete(limits = rev(levels(factor(error_df$LeadTime[error_df$site==sites[2]])))) +
                      theme(axis.title.x = element_blank(),
                            legend.position = 'none',
+                           axis.text = element_text(size = 15),
+                           strip.text = element_text(size = 15),
+                           axis.title = element_text(size = 15),
                            plot.margin = unit(c(1,3,1,1),'lines')) +
                      ylab(expression('Relative flux error'~(('predict - obs')~'/'~'obs')))+
                      annotation_custom(grob = textGrob(label = sites[2], hjust = 0, rot = 270),
@@ -86,6 +93,9 @@ fig_error_v_leadtime <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_in
                      xlab('Lead Time (days)') +
                      theme(legend.position = 'none',
                            axis.title.y = element_blank(),
+                           axis.text = element_text(size = 15),
+                           strip.text = element_text(size = 15),
+                           axis.title = element_text(size = 15),
                            plot.margin = unit(c(1,3,1,1),'lines'))+
                      annotation_custom(grob = textGrob(label = sites[3], hjust = 0, rot = 270),
                                        ymin = diff(boxplot.stats(abs(error_df$std_flux_error[error_df$site==sites[3]]))$stats[c(1,5)])/2,
@@ -102,6 +112,6 @@ fig_error_v_leadtime <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_in
 
   # save and post to Drive
   fig_file <- as_data_file(fig_ind)
-  png(fig_file); grid::grid.draw(g); dev.off()
+  png(fig_file, width = 12, height = 6, units = 'in',res = 300); grid::grid.draw(g); dev.off()
   gd_put(remote_ind=fig_ind, local_source=fig_file, config_file=config_file)
 }
