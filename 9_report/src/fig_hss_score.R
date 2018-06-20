@@ -2,6 +2,11 @@ fig_hss_score <- function(fig_ind, config_fig_yml, exceed_cfg_yml, preds_ind, ag
   # read in figure scheme config
   fig_config <- yaml::yaml.load_file(config_fig_yml)
 
+  site_labels <- fig_config$site_abbrev %>%
+    bind_rows() %>%
+    as.character()
+  names(site_labels) <- names(fig_config$site_abbrev)
+
   # exceedance thresholds
   exceed_thresh <- yaml::yaml.load_file(exceed_cfg_yml) %>%
     bind_rows() %>%
@@ -95,7 +100,7 @@ fig_hss_score <- function(fig_ind, config_fig_yml, exceed_cfg_yml, preds_ind, ag
     scale_fill_manual(values = c('long1' = fig_config$forecast_range$long1,
                                   'med' = fig_config$forecast_range$med),
                        labels = c('Long Range', 'Medium Range')) +
-    facet_wrap(~site, scales='fixed', nrow = 1, ncol = 3,
+    facet_wrap(~site, scales='fixed', nrow = 1, ncol = 3, labeller = labeller(site = site_labels),
                strip.position = 'top') +
     xlab(expression(Lead~Time~(days))) +
     ylab(expression(Forecasting~Skill~(Heidke~Skill~Score)))

@@ -15,3 +15,7 @@ model_type:
   retro: 'black'
   forecast: 'red'
 
+site_abbrev:
+  '05465500': 'Iowa R.'
+  '07374000': 'Mississippi R.'
+  '07144100': 'Arkansas R.'
