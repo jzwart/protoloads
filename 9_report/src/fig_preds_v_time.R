@@ -37,8 +37,6 @@ fig_preds_v_time <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_ind, r
           legend.key = element_blank(),
           strip.background = element_blank())
 
-  g
-
   # save and post to Drive
   fig_file <- as_data_file(fig_ind)
   ggsave(fig_file, plot=g, width=12, height=6)
