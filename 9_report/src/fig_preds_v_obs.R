@@ -30,7 +30,8 @@ fig_preds_v_obs <- function(fig_ind, config_fig_yml, loadest_preds_ind, wrtds_pr
     left_join(y = agg_nwis$flux, by = c('Site' = 'site', 'Date' = 'date')) %>%
     dplyr::filter(!is.na(daily_mean_flux), !is.na(pred_flux),
                   LeadTime %in% LeadTimes) %>%
-    rename(obs_flux = daily_mean_flux)
+    rename(obs_flux = daily_mean_flux) %>%
+    dplyr::filter(flux_model == 'Flux_wrtds')   ### just sticking with wrtds for iemss poster; remove line if we want both models plotted on 1:1 ###
 
   rmse <- preds_obs %>%
     group_by(Site, flux_model) %>%
@@ -48,7 +49,7 @@ fig_preds_v_obs <- function(fig_ind, config_fig_yml, loadest_preds_ind, wrtds_pr
     mutate(flux_model = 'Flux_loadest')
 
   # create the plot
-  g <- ggplot(preds_obs, aes(x = obs_flux/1000, y = pred_flux/1000, color = flux_model)) +
+  g <- ggplot(preds_obs, aes(x = obs_flux/1000, y = pred_flux/1000)) +
     geom_point(size = 2) +
     geom_blank(data = dummy, aes(x= x_val/1000, y = y_val/1000)) + # to make 1:1 axes
     theme(legend.title = element_blank(),
@@ -64,15 +65,15 @@ fig_preds_v_obs <- function(fig_ind, config_fig_yml, loadest_preds_ind, wrtds_pr
           legend.key = element_blank(),
           strip.background = element_blank(),
           plot.margin = unit(c(.5,1,.5,.5),units = 'cm')) +
-    scale_color_manual(values = c('Flux_loadest' = fig_config$load_model$loadest,
-                                  'Flux_wrtds' = fig_config$load_model$wrtds),
-                       labels = c('Loadest', 'WRTDS')) +
+    # scale_color_manual(values = c('Flux_loadest' = fig_config$load_model$loadest, # just plotting wrtds pred vs. obs now
+    #                               'Flux_wrtds' = fig_config$load_model$wrtds),
+    #                    labels = c('Loadest', 'WRTDS')) +
     geom_abline(slope = 1, intercept = 0, linetype = 'dashed') +
     facet_wrap(~Site, scales='free', nrow = 1, ncol = 3, labeller = labeller(Site = site_labels),
                strip.position = 'top') +
     xlab(expression(Observed~nitrate~flux~(Mg~N~day^-1))) +
-    ylab(expression(Predicted~nitrate~flux~(Mg~N~day^-1)))
-  # g
+    ylab(expression(Predicted~nitrate~flux~(Mg~N~day^-1))) +
+    scale_x_log10() + scale_y_log10()
 
   # save and post to Drive
   fig_file <- as_data_file(fig_ind)
