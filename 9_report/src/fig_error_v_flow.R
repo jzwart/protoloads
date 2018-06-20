@@ -2,6 +2,11 @@ fig_error_v_flow <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_ind, r
   # read in figure scheme config
   fig_config <- yaml::yaml.load_file(config_fig_yml)
 
+  site_labels <- fig_config$site_abbrev %>%
+    bind_rows() %>%
+    as.character()
+  names(site_labels) <- names(fig_config$site_abbrev)
+
   # predictions
   preds_df <- readRDS(sc_retrieve(preds_ind, remake_file)) %>%
     mutate(LeadTime = as.numeric(Date - ref_date, units='days'))
@@ -54,7 +59,7 @@ fig_error_v_flow <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_ind, r
                            axis.title = element_text(size = 15),
                            legend.position = 'none',
                            plot.margin = unit(c(1,3,1,1),'lines'))+
-                     annotation_custom(grob = textGrob(label = sites[1], hjust = 0, rot = 270),
+                     annotation_custom(grob = textGrob(label = site_labels[sites[1]], hjust = 0, rot = 270),
                                        ymin = diff(boxplot.stats(error_df$std_flux_error[error_df$site==sites[1]])$stats[c(1,5)])/2,
                                        ymax = diff(boxplot.stats(error_df$std_flux_error[error_df$site==sites[1]])$stats[c(1,5)])/2,
                                        xmin = 4.75,
@@ -85,7 +90,7 @@ fig_error_v_flow <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_ind, r
                            legend.text.align = 0,
                            plot.margin = unit(c(1,3,1,1),'lines')) +
                      ylab(expression('Relative flux error'~(('predict - obs')~'/'~'obs')))+
-                     annotation_custom(grob = textGrob(label = sites[2], hjust = 0, rot = 270),
+                     annotation_custom(grob = textGrob(label = site_labels[sites[2]], hjust = 0, rot = 270),
                                        ymin = diff(boxplot.stats(error_df$std_flux_error[error_df$site==sites[2]])$stats[c(1,5)])/2,
                                        ymax = diff(boxplot.stats(error_df$std_flux_error[error_df$site==sites[2]])$stats[c(1,5)])/2,
                                        xmin = 4.75,
@@ -111,7 +116,7 @@ fig_error_v_flow <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_ind, r
                            strip.text = element_text(size = 15),
                            axis.title = element_text(size = 15),
                            plot.margin = unit(c(1,3,1,1),'lines'))+
-                     annotation_custom(grob = textGrob(label = sites[3], hjust = 0, rot = 270),
+                     annotation_custom(grob = textGrob(label = site_labels[sites[3]], hjust = 0, rot = 270),
                                        ymin = diff(boxplot.stats(error_df$std_flux_error[error_df$site==sites[3]])$stats[c(1,5)])/2,
                                        ymax = diff(boxplot.stats(error_df$std_flux_error[error_df$site==sites[3]])$stats[c(1,5)])/2,
                                        xmin = 4.75,

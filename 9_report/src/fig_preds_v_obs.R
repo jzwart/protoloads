@@ -2,6 +2,11 @@ fig_preds_v_obs <- function(fig_ind, config_fig_yml, loadest_preds_ind, wrtds_pr
   # read in figure scheme config
   fig_config <- yaml::yaml.load_file(config_fig_yml)
 
+  site_labels <- fig_config$site_abbrev %>%
+    bind_rows() %>%
+    as.character()
+  names(site_labels) <- names(fig_config$site_abbrev)
+
   # read in the predictions
   loadest_preds_df <- readRDS(sc_retrieve(loadest_preds_ind, remake_file)) %>%
     select('Date','Flux','ref_date','Site','model_range')
@@ -16,7 +21,7 @@ fig_preds_v_obs <- function(fig_ind, config_fig_yml, loadest_preds_ind, wrtds_pr
     rename(site=site_no) %>%
     select('site', 'date', 'daily_mean_flux')
 
-  LeadTimes = c(0,1) # number of leadtimes we want to plot
+  LeadTimes = c(0) # number of leadtimes we want to plot
 
   # join predictions and obs together
   preds_obs <- left_join(loadest_preds_df, wrtds_preds_df, by = c('Date', 'ref_date', 'Site', 'model_range'), suffix = c('_loadest', '_wrtds')) %>%
@@ -63,7 +68,7 @@ fig_preds_v_obs <- function(fig_ind, config_fig_yml, loadest_preds_ind, wrtds_pr
                                   'Flux_wrtds' = fig_config$load_model$wrtds),
                        labels = c('Loadest', 'WRTDS')) +
     geom_abline(slope = 1, intercept = 0, linetype = 'dashed') +
-    facet_wrap(~Site, scales='free', nrow = 1, ncol = 3,
+    facet_wrap(~Site, scales='free', nrow = 1, ncol = 3, labeller = labeller(Site = site_labels),
                strip.position = 'top') +
     xlab(expression(Observed~nitrate~flux~(Mg~N~day^-1))) +
     ylab(expression(Predicted~nitrate~flux~(Mg~N~day^-1)))

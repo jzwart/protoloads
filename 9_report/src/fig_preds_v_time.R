@@ -2,6 +2,11 @@ fig_preds_v_time <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_ind, r
   # read in figure scheme config
   fig_config <- yaml::yaml.load_file(config_fig_yml)
 
+  site_labels <- fig_config$site_abbrev %>%
+    bind_rows() %>%
+    as.character()
+  names(site_labels) <- names(fig_config$site_abbrev)
+
   # read in the predictions
   preds_df <- readRDS(sc_retrieve(preds_ind, remake_file))
 
@@ -17,7 +22,7 @@ fig_preds_v_time <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_ind, r
     geom_line(data=dplyr::filter(agg_nwis$flux, date %in% preds_df$Date), size = 1.2,
               aes(x=date, y=daily_mean_flux/1000, linetype = 'Observed Flux'), show.legend = T,
               color=fig_config$model_type$retro) +
-    facet_grid(site ~ ., scale='free_y') +
+    facet_grid(site ~ ., scale='free_y', labeller = labeller(site = site_labels)) +
     scale_color_continuous('Lead Time (days)', low = fig_config$forecast_range$med, high = fig_config$forecast_range$long1) +
     xlab('Date') +
     ylab(expression('Nitrate Flux'~(Mg~'N-NO'[3]~day^{-1}))) +

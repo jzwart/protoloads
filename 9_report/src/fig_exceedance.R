@@ -2,6 +2,11 @@ fig_exceedance <- function(fig_ind, config_fig_yml, exceed_cfg_yml, preds_ind, a
   # read in figure scheme config
   fig_config <- yaml::yaml.load_file(config_fig_yml)
 
+  site_labels <- fig_config$site_abbrev %>%
+    bind_rows() %>%
+    as.character()
+  names(site_labels) <- names(fig_config$site_abbrev)
+
   # exceedance thresholds
   exceed_thresh <- yaml::yaml.load_file(exceed_cfg_yml) %>%
     bind_rows() %>%
@@ -17,13 +22,14 @@ fig_exceedance <- function(fig_ind, config_fig_yml, exceed_cfg_yml, preds_ind, a
     mutate(daily_mean_flux = daily_mean_conc * daily_mean_flow * 60*60*24/1000) %>% # flow in kg/d
     rename(site=site_no)
 
-  # cumulative frequency
+  # what if we only plotted with a lead time of 0?
   prob_exceed <- left_join(agg_nwis$flux, preds_df,
-                        by = c('site' = 'Site', 'date' = 'Date'),
-                        suffix = c('_truth', '_pred')) %>%
-    dplyr::filter(!is.na(Flux), !is.na(daily_mean_flux)) %>%
+                           by = c('site' = 'Site', 'date' = 'Date'),
+                           suffix = c('_truth', '_pred')) %>%
+    dplyr::filter(!is.na(Flux), !is.na(daily_mean_flux), LeadTime ==0) %>%
     mutate(flux_error = Flux - daily_mean_flux,
-           std_flux_error = (Flux - daily_mean_flux)/daily_mean_flux) %>%
+           std_flux_error = (Flux - daily_mean_flux)/daily_mean_flux,
+           month = format(date, '%m')) %>% # for grouping by month or week, etc..
     group_by(site) %>%
     arrange(daily_mean_flux, .by_group = T) %>%
     mutate(freq = seq(1,n())/n()) %>%
@@ -35,12 +41,16 @@ fig_exceedance <- function(fig_ind, config_fig_yml, exceed_cfg_yml, preds_ind, a
                                      TRUE ~ 'yes')) %>%
     group_by(site, date) %>%
     mutate(prob_exceed = sum(pred_exceeded == 'yes')/n()) %>%
+    ungroup() %>%
+    group_by(site, month, LeadTime) %>%
+    mutate(obs_exceeded_month = sum(obs_exceeded == 'yes')/n(),
+           pred_exceeded_month = sum(pred_exceeded == 'yes')/n()) %>%
     ungroup()
 
     # probability of exceeding is counting how many times forecasts exceeded threshold / number of forecasts
 
   g <- ggplot(prob_exceed, aes(x = daily_mean_flux/1000, y = prob_exceed)) +
-    geom_line(size = 1.2) +
+    geom_point(size = 4) +
     theme(legend.title = element_blank(),
           panel.grid.major = element_blank(),
           panel.grid.minor = element_blank(),
@@ -52,7 +62,7 @@ fig_exceedance <- function(fig_ind, config_fig_yml, exceed_cfg_yml, preds_ind, a
           legend.position = c(.15,.90),
           legend.key = element_blank(),
           strip.background = element_blank()) +
-    facet_wrap(~site, scales='free_x', nrow = 1, ncol = 3,
+    facet_wrap(~site, scales='free_x', nrow = 1, ncol = 3, labeller = labeller(site = site_labels),
                strip.position = 'top') +
     xlab(expression(Observed~nitrate~flux~(Mg~N~day^-1))) +
     ylab(expression(Fraction~of~Forecasts~Exceeding~Threshold)) +
