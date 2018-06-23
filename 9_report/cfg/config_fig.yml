@@ -1,19 +1,25 @@
 flow_class:
-  high: 'lightblue'
-  med: 'lightgreen'
-  low: 'orange'
+  high: 'steelblue4'
+  low: 'steelblue1'
 
 forecast_range:
   long1: 'yellow1'
   med: 'lightpink'
+
+forecast_range_dark:
+  long1: '#f9ba12'
+  med: '#e24975'
 
 load_model:
   loadest: 'darkgoldenrod1'
   wrtds: 'cyan3'
 
 model_type:
-  retro: 'black'
-  forecast: 'red'
+  obs: '#33007b'
+  cens: 'darkgrey'
+  retro: '#e96f23'
+  analysis: '#f9ba12'
+  forecast: '#e24975'
 
 site_abbrev:
   '05465500': 'Iowa R.'

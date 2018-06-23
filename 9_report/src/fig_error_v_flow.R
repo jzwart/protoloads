@@ -28,8 +28,8 @@ fig_error_v_flow <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_ind, r
            std_flux_error = (Flux - daily_mean_flux)/daily_mean_flux) %>%
     group_by(site) %>%
     mutate(flow_class = case_when( # adding low and high flow class for below and above median flow; could adjust to be higher /lower percentiles
-      daily_mean_flux < summary(daily_mean_flux)[2] ~ 'low',
-      daily_mean_flux > summary(daily_mean_flux)[4] ~ 'high',
+      daily_mean_flux < quantile(daily_mean_flux, 0.25) ~ 'low',
+      daily_mean_flux > quantile(daily_mean_flux, 0.75) ~ 'high',
       TRUE ~ 'med')) %>%
     ungroup() %>%
     dplyr::filter(LeadTime %in% LeadTimes,
@@ -38,27 +38,34 @@ fig_error_v_flow <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_ind, r
 
   sites = unique(error_df$site)
 
-  # standardized flux error
+  # prepare a color scale and theme to share
+  shared_fill_scale <- scale_fill_manual(
+    name='flow_class',
+    values = setNames(
+      colorRampPalette(c(fig_config$flow_class$high, fig_config$flow_class$low))(3),
+      c('high','med','low')),
+    labels = c(expression('High Flow '('>75'^'th')),
+               expression('Medium Flow '('25'^'th'-'75'^'th')),
+               expression('Low Flow '('<25'^'th'))))
+  shared_theme <- theme_classic() +
+    theme(axis.text = element_text(size = 15),
+          strip.text = element_text(size = 15),
+          axis.title = element_text(size = 15),
+          plot.margin = unit(c(1,3,1,1),'lines'))
+
+  # plot with standardized flux error
   g1 <- ggplotGrob(ggplot(error_df[error_df$site==sites[1],], aes(x=factor(LeadTime), y=std_flux_error, fill = flow_class)) +
                      geom_hline(yintercept = 0,
                                 linetype = 'dashed') +
                      geom_boxplot(outlier.shape = NA,
                                   width = 0.7) +
-                     scale_fill_manual(name = 'flow_class',
-                       values = c('high' = fig_config$flow_class$high,
-                                  'med' = fig_config$flow_class$med,
-                                  'low' = fig_config$flow_class$low),
-                       labels = c('High Flow', 'Medium Flow', 'Low Flow')) +
-                     theme_classic()+
+                     shared_fill_scale +
                      ylim(boxplot.stats(error_df$std_flux_error[error_df$site==sites[1]])$stats[c(1,5)]) +
                      scale_x_discrete(limits = rev(levels(factor(error_df$LeadTime[error_df$site==sites[1]])))) +
+                     shared_theme +
                      theme(axis.title.x = element_blank(),
                            axis.title.y = element_blank(),
-                           axis.text = element_text(size = 15),
-                           strip.text = element_text(size = 15),
-                           axis.title = element_text(size = 15),
-                           legend.position = 'none',
-                           plot.margin = unit(c(1,3,1,1),'lines'))+
+                           legend.position = 'none') +
                      annotation_custom(grob = textGrob(label = site_labels[sites[1]], hjust = 0, rot = 270),
                                        ymin = diff(boxplot.stats(error_df$std_flux_error[error_df$site==sites[1]])$stats[c(1,5)])/2,
                                        ymax = diff(boxplot.stats(error_df$std_flux_error[error_df$site==sites[1]])$stats[c(1,5)])/2,
@@ -70,29 +77,19 @@ fig_error_v_flow <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_ind, r
                                 linetype = 'dashed') +
                      geom_boxplot(outlier.shape = NA,
                                   width = 0.7) +
-                     scale_fill_manual(name = 'flow_class',
-                                       values = c('high' = fig_config$flow_class$high,
-                                                  'med' = fig_config$flow_class$med,
-                                                  'low' = fig_config$flow_class$low),
-                                       labels = c(expression('High Flow '('>75'^'th')),
-                                                  expression('Medium Flow '('25'^'th'-'75'^'th')),
-                                                  expression('Low Flow '('<25'^'th')))) +
-                     theme_classic()+
+                     shared_fill_scale +
                      ylim(boxplot.stats(error_df$std_flux_error[error_df$site==sites[2]])$stats[c(1,5)]) +
                      scale_x_discrete(limits = rev(levels(factor(error_df$LeadTime[error_df$site==sites[2]])))) +
+                     shared_theme +
                      theme(axis.title.x = element_blank(),
                            legend.position = c(.9,.8),
                            legend.title = element_blank(),
-                           axis.text = element_text(size = 15),
-                           strip.text = element_text(size = 15),
-                           axis.title = element_text(size = 15),
                            legend.text = element_text(size = 12),
-                           legend.text.align = 0,
-                           plot.margin = unit(c(1,3,1,1),'lines')) +
+                           legend.text.align = 0) +
                      ylab(expression('Relative flux error'~(('predict - obs')~'/'~'obs')))+
                      annotation_custom(grob = textGrob(label = site_labels[sites[2]], hjust = 0, rot = 270),
-                                       ymin = diff(boxplot.stats(error_df$std_flux_error[error_df$site==sites[2]])$stats[c(1,5)])/2,
-                                       ymax = diff(boxplot.stats(error_df$std_flux_error[error_df$site==sites[2]])$stats[c(1,5)])/2,
+                                       ymin = diff(boxplot.stats(error_df$std_flux_error[error_df$site==sites[2]])$stats[c(1,5)])*0.9,
+                                       ymax = diff(boxplot.stats(error_df$std_flux_error[error_df$site==sites[2]])$stats[c(1,5)])*0.9,
                                        xmin = 4.75,
                                        xmax = 4.75))
 
@@ -101,24 +98,16 @@ fig_error_v_flow <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_ind, r
                                 linetype = 'dashed') +
                      geom_boxplot(outlier.shape = NA,
                                   width = 0.7) +
-                     scale_fill_manual(name = 'flow_class',
-                                       values = c('high' = fig_config$flow_class$high,
-                                                  'med' = fig_config$flow_class$med,
-                                                  'low' = fig_config$flow_class$low),
-                                       labels = c('High Flow', 'Medium Flow', 'Low Flow')) +
-                     theme_classic()+
+                     shared_fill_scale +
                      ylim(boxplot.stats(error_df$std_flux_error[error_df$site==sites[3]])$stats[c(1,5)]) +
                      scale_x_discrete(limits = rev(levels(factor(error_df$LeadTime[error_df$site==sites[3]])))) +
                      xlab('Lead Time (days)') +
+                     shared_theme +
                      theme(legend.position = 'none',
-                           axis.title.y = element_blank(),
-                           axis.text = element_text(size = 15),
-                           strip.text = element_text(size = 15),
-                           axis.title = element_text(size = 15),
-                           plot.margin = unit(c(1,3,1,1),'lines'))+
+                           axis.title.y = element_blank())+
                      annotation_custom(grob = textGrob(label = site_labels[sites[3]], hjust = 0, rot = 270),
-                                       ymin = diff(boxplot.stats(error_df$std_flux_error[error_df$site==sites[3]])$stats[c(1,5)])/2,
-                                       ymax = diff(boxplot.stats(error_df$std_flux_error[error_df$site==sites[3]])$stats[c(1,5)])/2,
+                                       ymin = diff(boxplot.stats(error_df$std_flux_error[error_df$site==sites[3]])$stats[c(1,5)])*0.7,
+                                       ymax = diff(boxplot.stats(error_df$std_flux_error[error_df$site==sites[3]])$stats[c(1,5)])*0.7,
                                        xmin = 4.75,
                                        xmax = 4.75))
 

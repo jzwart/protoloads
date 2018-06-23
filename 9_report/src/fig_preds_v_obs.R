@@ -50,7 +50,7 @@ fig_preds_v_obs <- function(fig_ind, config_fig_yml, loadest_preds_ind, wrtds_pr
 
   # create the plot
   g <- ggplot(preds_obs, aes(x = obs_flux/1000, y = pred_flux/1000)) +
-    geom_point(size = 2) +
+    geom_point(size = 2, alpha=0.5, color = fig_config$model_type$forecast) +
     geom_blank(data = dummy, aes(x= x_val/1000, y = y_val/1000)) + # to make 1:1 axes
     theme(legend.title = element_blank(),
           panel.grid.major = element_blank(),
@@ -71,8 +71,8 @@ fig_preds_v_obs <- function(fig_ind, config_fig_yml, loadest_preds_ind, wrtds_pr
     geom_abline(slope = 1, intercept = 0, linetype = 'dashed') +
     facet_wrap(~Site, scales='free', nrow = 1, ncol = 3, labeller = labeller(Site = site_labels),
                strip.position = 'top') +
-    xlab(expression(Observed~nitrate~flux~(Mg~N~day^-1))) +
-    ylab(expression(Predicted~nitrate~flux~(Mg~N~day^-1))) +
+    xlab(expression(Observed~nitrate~flux~(Mg~'N-NO'[3]^'-'~d^-1))) +
+    ylab(expression(Predicted~nitrate~flux~(Mg~'N-NO'[3]^'-'~d^-1))) +
     scale_x_log10() + scale_y_log10()
 
   # save and post to Drive
