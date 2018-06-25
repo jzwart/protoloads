@@ -20,12 +20,13 @@ fig_preds_v_time <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_ind, r
   g <- ggplot(mutate(preds_df, LeadTime=as.numeric(Date - ref_date, units='days')), aes(x=Date, y=Flux/1000, color=LeadTime)) +
     geom_point() +
     geom_line(data=dplyr::filter(agg_nwis$flux, date %in% preds_df$Date), size = 1.2,
-              aes(x=date, y=daily_mean_flux/1000, linetype = 'Observed Flux'), show.legend = T,
-              color=fig_config$model_type$retro) +
+              aes(x=date, y=daily_mean_flux/1000, linetype = 'Observed'), show.legend = T,
+              color=fig_config$model_type$obs) +
     facet_grid(site ~ ., scale='free_y', labeller = labeller(site = site_labels)) +
-    scale_color_continuous('Lead Time (days)', low = fig_config$forecast_range$med, high = fig_config$forecast_range$long1) +
+    scale_color_continuous('Lead Time (d)', low = fig_config$forecast_range$med, high = fig_config$forecast_range$long1) +
+    scale_linetype_discrete(name='')+
     xlab('Date') +
-    ylab(expression('Nitrate Flux'~(Mg~'N-NO'[3]~day^{-1}))) +
+    ylab(expression('Nitrate Flux '~(Mg~'N-NO'[3]^'-'~d^{-1}))) +
     theme(panel.grid.major = element_blank(),
           panel.grid.minor = element_blank(),
           panel.background = element_blank(),

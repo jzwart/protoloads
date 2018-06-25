@@ -1,4 +1,5 @@
-fig_exceedance <- function(fig_ind, config_fig_yml, exceed_cfg_yml, preds_ind, agg_nwis_ind, remake_file, config_file) {
+fig_exceedance <- function(fig_ind, config_fig_yml, exceedance_df, exceed_cfg_yml, preds_ind, agg_nwis_ind, remake_file, config_file) {
+
   # read in figure scheme config
   fig_config <- yaml::yaml.load_file(config_fig_yml)
 
@@ -22,35 +23,57 @@ fig_exceedance <- function(fig_ind, config_fig_yml, exceed_cfg_yml, preds_ind, a
     mutate(daily_mean_flux = daily_mean_conc * daily_mean_flow * 60*60*24/1000) %>% # flow in kg/d
     rename(site=site_no)
 
-  # what if we only plotted with a lead time of 0?
-  prob_exceed <- left_join(agg_nwis$flux, preds_df,
-                           by = c('site' = 'Site', 'date' = 'Date'),
-                           suffix = c('_truth', '_pred')) %>%
-    dplyr::filter(!is.na(Flux), !is.na(daily_mean_flux), LeadTime ==0) %>%
-    mutate(flux_error = Flux - daily_mean_flux,
-           std_flux_error = (Flux - daily_mean_flux)/daily_mean_flux,
-           month = format(date, '%m')) %>% # for grouping by month or week, etc..
-    group_by(site) %>%
-    arrange(daily_mean_flux, .by_group = T) %>%
-    mutate(freq = seq(1,n())/n()) %>%
-    ungroup() %>%
-    left_join(y = exceed_thresh, by ='site') %>%
-    mutate(obs_exceeded = case_when(daily_mean_flux/1000 < flux_threshold ~ 'no',
-                                    TRUE ~ 'yes'),
-           pred_exceeded = case_when(Flux/1000 < flux_threshold ~ 'no',
-                                     TRUE ~ 'yes')) %>%
-    group_by(site, date) %>%
-    mutate(prob_exceed = sum(pred_exceeded == 'yes')/n()) %>%
-    ungroup() %>%
-    group_by(site, month, LeadTime) %>%
-    mutate(obs_exceeded_month = sum(obs_exceeded == 'yes')/n(),
-           pred_exceeded_month = sum(pred_exceeded == 'yes')/n()) %>%
-    ungroup()
+  # combined predictions and observations
+  pred_obs <- preds_df %>%
+    as_data_frame() %>%
+    # add in manually-selected thresholds and observations
+    left_join(mutate(exceed_thresh, FluxThreshold=1000*flux_threshold), by=c(Site='site')) %>%
+    left_join(select(agg_nwis$flux, Site=site, Date=date, ObsFlux=daily_mean_flux), by=c('Date','Site'))
 
-    # probability of exceeding is counting how many times forecasts exceeded threshold / number of forecasts
+  # examples
+  exceedance_site <- filter(exceedance_df, Site == '05465500')
+  examples_specs <- list(
+    true_positive = exceedance_site %>% filter(TruePositive, StartsBelow),
+    false_positive = exceedance_site %>% filter(FalsePositive, PredNumExceeded==5, ObsNumExceeded==0, StartsBelow, EndsBelow),
+    true_negative = exceedance_site %>% filter(TrueNegative, PredNumExceeded==0, StartsBelow, EndsBelow),
+    false_negative = exceedance_site %>% filter(FalseNegative, StartDate==as.Date('2017-05-14'))
+  ) %>% lapply(slice, 1)
+  examples_data <- lapply(examples_specs, function(specs) {
+    type <- specs %>%
+      gather(TypeName, IsType, TruePositive, FalsePositive, TrueNegative, FalseNegative) %>%
+      filter(IsType) %>%
+      pull(TypeName)
+    pred_obs %>%
+      filter(
+        Site == specs$Site,
+        model_range == specs$model_range,
+        ref_date==specs$ref_date,
+        Date >= specs$StartDate,
+        Date <= specs$EndDate) %>%
+      mutate(ErrorType = type)
+  }) %>% bind_rows() %>%
+    mutate(
+      ErrorType = ordered(
+        gsub('False', 'False ',
+             gsub('True', 'True ',
+                  gsub('Positive', 'Exceedance',
+                       gsub('Negative', 'Non-Exceedance',
+                            ErrorType)))),
+        levels=c('True Exceedance', 'False Exceedance', 'True Non-Exceedance', 'False Non-Exceedance')),
+      Predicted=Flux,
+      Observed=ObsFlux) %>%
+    gather(CurveType, Flux, Predicted, Observed)
 
-  g <- ggplot(prob_exceed, aes(x = daily_mean_flux/1000, y = prob_exceed)) +
-    geom_point(size = 4) +
+  # identify some friendly date breaks
+  date_breaks <- examples_specs %>%
+    bind_rows %>%
+    transmute(Left=StartDate + as.difftime(2, units='days'), Right = EndDate - as.difftime(2, units='days')) %>%
+    gather(Bound, Date, Left, Right) %>%
+    pull(Date)
+  g <- ggplot(examples_data, aes(x=Date)) +
+    geom_hline(aes(yintercept=flux_threshold), linetype='dashed') +
+    geom_line(aes(y=Flux/1000, group=CurveType, color=CurveType), size=1) +
+    geom_point(aes(y=Flux/1000, group=CurveType, color=CurveType), size=2) +
     theme(legend.title = element_blank(),
           panel.grid.major = element_blank(),
           panel.grid.minor = element_blank(),
@@ -59,21 +82,18 @@ fig_exceedance <- function(fig_ind, config_fig_yml, exceed_cfg_yml, preds_ind, a
           strip.text = element_text(size = 15),
           axis.title = element_text(size = 15),
           axis.line = element_line(colour = "black"),
+          legend.text = element_text(size = 12),
           legend.position = c(.15,.90),
           legend.key = element_blank(),
           strip.background = element_blank()) +
-    facet_wrap(~site, scales='free_x', nrow = 1, ncol = 3, labeller = labeller(site = site_labels),
-               strip.position = 'top') +
-    xlab(expression(Observed~nitrate~flux~(Mg~N~day^-1))) +
-    ylab(expression(Fraction~of~Forecasts~Exceeding~Threshold)) +
-    annotate("segment", x=-Inf, xend=-Inf, y=-Inf, yend=Inf, size = 1.1)+
-    geom_vline(aes(xintercept=flux_threshold),
-               color='red',
-               size = 1.3,
-               linetype= 'dashed', exceed_thresh) # adding threshold
+    theme(legend.position=c(0.1, 0.2), legend.background=element_blank()) +
+    facet_grid(. ~ ErrorType, scales='free_x') +
+    scale_x_date(breaks=date_breaks, date_labels="%m/%d/%y") +
+    scale_color_manual('', values=c(Predicted=fig_config$model_type$forecast, Observed=fig_config$model_type$obs)) +
+    ylab(expression(Nitrate~flux~(Mg~'N-NO'[3]^'-'~d^-1)))
 
   # save and post to Drive
   fig_file <- as_data_file(fig_ind)
-  ggsave(fig_file, plot=g, width=14, height=5)
+  ggsave(fig_file, plot=g, width=12, height=3.6)
   gd_put(remote_ind=fig_ind, local_source=fig_file, config_file=config_file)
 }

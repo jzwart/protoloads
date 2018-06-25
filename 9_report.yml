@@ -18,6 +18,7 @@ sources:
   - 9_report/src/fig_exceedance.R
   - 9_report/src/fig_hss_score.R
   - 3_forecast/src/prep_inputs.R
+  - 9_report/src/calc_exceedance.R
 
 targets:
 
@@ -70,6 +71,7 @@ targets:
       fig_ind=target_name,
       config_fig_yml = '9_report/cfg/config_fig.yml',
       input_example_yml = '9_report/cfg/input_data_example.yml',
+      nwis_data_ind='2_munge/out/agg_nwis.rds.ind',
       preds_ind='3_forecast/out/preds_wrtds.rds.ind',
       remake_file=I('9_report.yml'),
       config_file='lib/cfg/gd_config.yml')
@@ -110,10 +112,23 @@ targets:
   9_report/out/fig_preds_v_obs.png:
     command: gd_get('9_report/out/fig_preds_v_obs.png.ind', config_file='lib/cfg/gd_config.yml')
 
+  exceedance:
+    command: calc_exceedance(
+      exceed_cfg_yml = '9_report/cfg/exceedance_threshold.yml',
+      preds_ind = '3_forecast/out/preds_wrtds.rds.ind',
+      agg_nwis_ind = '2_munge/out/agg_nwis.rds.ind',
+      remake_file = I('9_report.yml'))
+
+  exceedance_HSS:
+    command: calc_exceedance_HSS(
+      exceedance_df = exceedance,
+      remake_file = I('9_report.yml'))
+
   9_report/out/fig_exceedance.png.ind:
     command: fig_exceedance(
       fig_ind=target_name,
       config_fig_yml = '9_report/cfg/config_fig.yml',
+      exceedance_df = exceedance,
       exceed_cfg_yml = '9_report/cfg/exceedance_threshold.yml',
       preds_ind='3_forecast/out/preds_wrtds.rds.ind',
       agg_nwis_ind='2_munge/out/agg_nwis.rds.ind',
@@ -126,10 +141,7 @@ targets:
     command: fig_hss_score(
       fig_ind=target_name,
       config_fig_yml = '9_report/cfg/config_fig.yml',
-      exceed_cfg_yml = '9_report/cfg/exceedance_threshold.yml',
-      preds_ind='3_forecast/out/preds_wrtds.rds.ind',
-      agg_nwis_ind='2_munge/out/agg_nwis.rds.ind',
-      remake_file=I('9_report.yml'),
+      hss_df = exceedance_HSS,
       config_file='lib/cfg/gd_config.yml')
   9_report/out/fig_hss_score.png:
     command: gd_get('9_report/out/fig_hss_score.png.ind', config_file='lib/cfg/gd_config.yml')
