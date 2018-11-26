@@ -52,7 +52,7 @@ choose_sites <- function(ind_file, dates_yml, params_yml, gd_config) {
     dplyr::filter(
       site_no %in% flow_sites,
       is.na(stat_cd),
-      parm_cd=='99133',
+      parm_cd %in% c( "00630", "00631","99133"),
       as.Date(begin_date) <= as.Date(dates$calibrate$start),
       as.Date(end_date) >= as.Date(dates$forecast$end)) %>%
     pull(site_no) %>%
