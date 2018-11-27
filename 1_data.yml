@@ -6,6 +6,7 @@ include:
 packages:
   - dataRetrieval
   - ncdf4
+  - EGRET
 
 file_extensions:
   - feather
@@ -94,7 +95,7 @@ targets:
     command: subset_nwm(
       ind_file=target_name,
       model_configuration=I('http://localhost/thredds/dodsC/nwm_retro'),
-      comids='1_data/out/comids.tsv.ind',
+      comids='1_data/out/comids_subset.tsv.ind',
       remake_file = I('1_data.yml'),
       gd_config='lib/cfg/gd_config.yml')
 
@@ -102,7 +103,7 @@ targets:
     command: subset_nwm(
       ind_file=target_name,
       model_configuration=I('http://localhost/thredds/dodsC/analysis_assim'),
-      comids='1_data/out/comids.tsv.ind',
+      comids='1_data/out/comids_subset.tsv.ind',
       remake_file = I('1_data.yml'),
       gd_config='lib/cfg/gd_config.yml')
 
@@ -110,7 +111,7 @@ targets:
     command: subset_nwm(
       ind_file=target_name,
       model_configuration=I('http://localhost/thredds/dodsC/medium_range'),
-      comids='1_data/out/comids.tsv.ind',
+      comids='1_data/out/comids_subset.tsv.ind',
       remake_file = I('1_data.yml'),
       gd_config='lib/cfg/gd_config.yml')
 
@@ -118,7 +119,7 @@ targets:
     command: subset_nwm(
       ind_file=target_name,
       model_configuration=I('http://localhost/thredds/dodsC/long_range_mem1'),
-      comids='1_data/out/comids.tsv.ind',
+      comids='1_data/out/comids_subset.tsv.ind',
       remake_file = I('1_data.yml'),
       gd_config='lib/cfg/gd_config.yml')
 
@@ -126,7 +127,7 @@ targets:
     command: subset_nwm(
       ind_file=target_name,
       model_configuration=I('http://localhost/thredds/dodsC/long_range_mem2'),
-      comids='1_data/out/comids.tsv.ind',
+      comids='1_data/out/comids_subset.tsv.ind',
       remake_file = I('1_data.yml'),
       gd_config='lib/cfg/gd_config.yml')
 
@@ -134,7 +135,7 @@ targets:
     command: subset_nwm(
       ind_file=target_name,
       model_configuration=I('http://localhost/thredds/dodsC/long_range_mem3'),
-      comids='1_data/out/comids.tsv.ind',
+      comids='1_data/out/comids_subset.tsv.ind',
       remake_file = I('1_data.yml'),
       gd_config='lib/cfg/gd_config.yml')
 
@@ -142,7 +143,7 @@ targets:
     command: subset_nwm(
       ind_file=target_name,
       model_configuration=I('http://localhost/thredds/dodsC/long_range_mem4'),
-      comids='1_data/out/comids.tsv.ind',
+      comids='1_data/out/comids_subset.tsv.ind',
       remake_file = I('1_data.yml'),
       gd_config='lib/cfg/gd_config.yml')
 

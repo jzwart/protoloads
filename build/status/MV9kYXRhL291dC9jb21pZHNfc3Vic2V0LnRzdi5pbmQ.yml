@@ -1,14 +1,13 @@
 version: 0.3.0
 name: 1_data/out/comids_subset.tsv.ind
 type: file
-hash: c0074d471788f41debe0a05e3a57146d
-time: 2018-05-09 17:18:14 UTC
+hash: 64cd2527f70de76af95e6899de732c04
+time: 2018-11-27 20:34:40 UTC
 depends:
-  1_data/out/sites_subset.yml.ind: d164ae6e6957f89cc868a4c3fcd18b9b
-  1_data/in/linked_sites.gpkg.ind: 3e59679667511a63b00f7c2f91669f25
-  1_data.yml: d69c9ce02f8ebf6d0ccd102126914350
+  1_data/out/sites_subset.yml.ind: b8d9fc495a0a8d62fe5a3e2f4edf7ff0
+  1_data/in/linked_sites.gpkg.ind: fae2bc6ce44f9e708d468fbd79b75d97
   lib/cfg/gd_config.yml: cf9c52868594c233f17a6f751a553018
-fixed: e033b3ef1109146785393a167625f337
+fixed: 4602e0856023909dc0858ed223e4caa8
 code:
   functions:
     lookup_comid: 5cfa7009dabbd5068c1ab66248346153

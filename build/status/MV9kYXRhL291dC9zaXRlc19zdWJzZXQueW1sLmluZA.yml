@@ -1,8 +1,8 @@
 version: 0.3.0
 name: 1_data/out/sites_subset.yml.ind
 type: file
-hash: f04a8d927f9888d821800957c703552a
-time: 2018-11-26 22:30:39 UTC
+hash: b8d9fc495a0a8d62fe5a3e2f4edf7ff0
+time: 2018-11-27 20:20:15 UTC
 depends:
   1_data/out/sites.yml: 14349bb0eaa55b8fb99c32ef50967dac
   1_data/cfg/dates.yml: b56d3e6ff9cbe975be082f6c11c2847a
@@ -11,5 +11,5 @@ depends:
 fixed: 551a0cfc524c735c29f59310d3ab5076
 code:
   functions:
-    subset_sites: db6bc996a0fac5a86811cd0088e9aa58
+    subset_sites: 39938b274fa7341e5a016a2dca62f134
 
