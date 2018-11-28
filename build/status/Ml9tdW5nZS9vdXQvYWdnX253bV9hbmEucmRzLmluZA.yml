@@ -1,11 +1,11 @@
 version: 0.3.0
 name: 2_munge/out/agg_nwm_ana.rds.ind
 type: file
-hash: 2c377d77971912bd48041675465dd275
-time: 2018-06-07 17:47:57 UTC
+hash: 83b546f823277100c8675e13d21300f5
+time: 2018-11-28 21:37:45 UTC
 depends:
-  1_data/out/nwm_ana.nc.ind: bb8b9b43a6d9b4e53409994efeb64134
-  1_data/out/site_info.tsv.ind: 021128d5fb039bd75966574f9ca7c78d
+  1_data/out/nwm_ana.nc.ind: 979fd0da3f78cbd1c9e7da0eef126806
+  1_data/out/site_info.tsv.ind: 9f8a92900524b65333a86b07033ffd79
   lib/cfg/gd_config.yml: cf9c52868594c233f17a6f751a553018
 fixed: 5b7e030a1b8d79a8a159dbaebf94ecc5
 code:

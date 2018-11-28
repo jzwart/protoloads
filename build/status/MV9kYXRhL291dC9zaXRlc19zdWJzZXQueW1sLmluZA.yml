@@ -2,11 +2,11 @@ version: 0.3.0
 name: 1_data/out/sites_subset.yml.ind
 type: file
 hash: 9d3ea3d95f8a8226621b290c9063d7ee
-time: 2018-11-28 15:09:41 UTC
+time: 2018-11-28 21:16:11 UTC
 depends:
   1_data/out/sites.yml: 74ff24ad0f9f13e57ca9309102228d67
-  1_data/cfg/dates.yml: 8a09da3167e8217bb037ea481bb6f13a
-  1_data/cfg/params.yml: 99b5922a100d7d7085acba2e404a9035
+  1_data/cfg/dates.yml: b56d3e6ff9cbe975be082f6c11c2847a
+  1_data/cfg/params.yml: 90a61f36f8a56d0e069a46e0b0379025
   lib/cfg/gd_config.yml: cf9c52868594c233f17a6f751a553018
 fixed: 551a0cfc524c735c29f59310d3ab5076
 code:
