@@ -25,7 +25,7 @@ subset_sites <- function(ind_file, sites_yml, dates_yml, params_yml, gd_config){
   no3_sites <- nitrate_data_munged %>%
     dplyr::filter(
       is.na(stat_cd),
-      count_nu > 200) %>%  # choosing sites over 300 grab samples
+      count_nu > 300) %>%  # choosing sites over 300 grab samples
     dplyr::pull(site_no) %>%
     sort()
 
