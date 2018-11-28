@@ -1,10 +1,10 @@
 version: 0.3.0
 name: 1_data/out/nwm_long2.nc.ind
 type: file
-hash: 1d2710ce10ea214152c6d39644407def
-time: 2018-06-05 22:28:10 UTC
+hash: 320effa9ca0bf003257d7f0f11193b9a
+time: 2018-11-28 18:33:31 UTC
 depends:
-  1_data/out/comids.tsv.ind: 7ec117389b1681f08f01c164d1a3bd11
+  1_data/out/comids_subset.tsv.ind: 705cbb020552dfbb3aede12c3f14034f
   lib/cfg/gd_config.yml: cf9c52868594c233f17a6f751a553018
 fixed: 67f825a82a7c3488e9ad5289b990689e
 code:
