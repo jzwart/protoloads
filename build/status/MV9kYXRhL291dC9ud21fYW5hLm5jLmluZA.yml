@@ -1,10 +1,10 @@
 version: 0.3.0
 name: 1_data/out/nwm_ana.nc.ind
 type: file
-hash: bb8b9b43a6d9b4e53409994efeb64134
-time: 2018-06-05 22:40:43 UTC
+hash: 979fd0da3f78cbd1c9e7da0eef126806
+time: 2018-11-28 17:18:58 UTC
 depends:
-  1_data/out/comids.tsv.ind: 7ec117389b1681f08f01c164d1a3bd11
+  1_data/out/comids_subset.tsv.ind: 705cbb020552dfbb3aede12c3f14034f
   lib/cfg/gd_config.yml: cf9c52868594c233f17a6f751a553018
 fixed: 0a86a921dd954a04a357e58c54b585ca
 code:
