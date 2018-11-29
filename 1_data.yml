@@ -66,6 +66,8 @@ targets:
       params_yml='1_data/cfg/params.yml',
       gd_config='lib/cfg/gd_config.yml')
 
+  # need to break up NWIS pulls into individual
+
   1_data/in/linked_sites.gpkg.ind:
     command: gd_confirm_posted('1_data/in/linked_sites.gpkg.ind', config_file='lib/cfg/gd_config.yml')
   1_data/in/linked_sites.gpkg:

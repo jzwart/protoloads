@@ -4,6 +4,8 @@ pull_nwis <- function(ind_file, sites_subset_yml, dates_yml, params_yml, gd_conf
   pcodes <- yaml::yaml.load_file(params_yml)
   site_ids <- yaml::yaml.load_file(sites_subset_yml)
 
+  dates$pull$start = '2010-01-01' # pulling less data and not changing dates.yml to not force a rebuild
+
   # dummyStart=as.Date(dates$forecast$start) - as.difftime(5, units='days')
   # dummyEnd=as.Date(dates$forecast$start) + as.difftime(5, units='days')
   message('  starting download of NWIS flow data at ', Sys.time())
