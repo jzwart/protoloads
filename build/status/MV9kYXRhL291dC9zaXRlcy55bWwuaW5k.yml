@@ -2,9 +2,9 @@ version: 0.3.0
 name: 1_data/out/sites.yml.ind
 type: file
 hash: 2f0a26b735c14a6c570ade7a87bd5bde
-time: 2018-11-28 21:14:46 UTC
+time: 2018-11-29 18:07:24 UTC
 depends:
-  1_data/cfg/dates.yml: b56d3e6ff9cbe975be082f6c11c2847a
+  1_data/cfg/dates.yml: 8a09da3167e8217bb037ea481bb6f13a
   1_data/cfg/params.yml: 90a61f36f8a56d0e069a46e0b0379025
   lib/cfg/gd_config.yml: cf9c52868594c233f17a6f751a553018
 fixed: 369ba5d384310cb882471bd98cec5690
