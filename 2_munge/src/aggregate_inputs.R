@@ -16,18 +16,18 @@ aggregate_nwis <- function(ind_file, raw_ind_file, remake_file, sites_file, gd_c
     mutate(tz_cd = 'UTC') %>%
     as_data_frame()
 
-  agg_sensor = input_raw$nitrate_sensor %>%
-    dplyr::filter(
-      site_no %in% sites,
-      remark_cd != 'P Eqp') %>%
-    mutate(date = as.Date(dateTime)) %>%
-    group_by(site_no, date, parm_cd) %>%
-    summarise(
-      daily_mean = mean(result_va),
-      daily_cd = ifelse('<' %in% remark_cd, '<', '')) %>%
-    ungroup() %>%
-    mutate(tz_cd = 'UTC') %>%
-    as_data_frame()
+  # agg_sensor = input_raw$nitrate_sensor %>%
+  #   dplyr::filter(
+  #     site_no %in% sites,
+  #     remark_cd != 'P Eqp') %>%
+  #   mutate(date = as.Date(dateTime)) %>%
+  #   group_by(site_no, date, parm_cd) %>%
+  #   summarise(
+  #     daily_mean = mean(result_va),
+  #     daily_cd = ifelse('<' %in% remark_cd, '<', '')) %>%
+  #   ungroup() %>%
+  #   mutate(tz_cd = 'UTC') %>%
+  #   as_data_frame()
 
   agg_grab = input_raw$nitrate_grab %>%
     dplyr::filter(site_no %in% sites, parm_cd != '99133') %>% # stats package overrides dplyr filter()
@@ -41,7 +41,7 @@ aggregate_nwis <- function(ind_file, raw_ind_file, remake_file, sites_file, gd_c
     as_data_frame()
 
   data_file <- as_data_file(ind_file)
-  saveRDS(list(flow = agg_flow, nitrate_sensor = agg_sensor, nitrate_grab = agg_grab), data_file)
+  saveRDS(list(flow = agg_flow, nitrate_grab = agg_grab), data_file)
   gd_put(remote_ind = ind_file, local_source = data_file, config_file = gd_config)
 }
 

@@ -1,14 +1,14 @@
 version: 0.3.0
 name: 2_munge/out/agg_nwis.rds.ind
 type: file
-hash: 843dd0deae276a67588283e8171726fb
-time: 2018-05-16 00:15:23 UTC
+hash: 2a81c0f19f388ed3c0956a49e596b8fb
+time: 2018-11-30 13:30:25 UTC
 depends:
-  1_data/out/nwis.rds.ind: ded4d426330d2117f697fd91d333e665
-  1_data/out/site_info.tsv.ind: 021128d5fb039bd75966574f9ca7c78d
+  1_data/out/nwis.rds.ind: 229cb194a3ff57de3d2d7dcbd176cb2d
+  1_data/out/site_info.tsv.ind: 9f8a92900524b65333a86b07033ffd79
   lib/cfg/gd_config.yml: cf9c52868594c233f17a6f751a553018
 fixed: 1c50a2003087d6db672d03da87dd8367
 code:
   functions:
-    aggregate_nwis: a449502534ac16d35c37f1ad89104ba3
+    aggregate_nwis: 8e47dbe85f4c826192e7207aa8974483
 
