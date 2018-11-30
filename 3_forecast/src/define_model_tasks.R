@@ -90,18 +90,18 @@ plan_forecasts <- function(
     }
   )
 
-  forecast_loadest <- scipiper::create_task_step(
-    step_name = 'forecast_loadest',
-    target_name = function(task_name, step_name, ...) {
-      file.path(folders$tmp, sprintf('preds_loadest_%s.rds', task_name))
-    },
-    command = function(task_name, ...) {
-      psprintf(
-        "apply_loadest(",
-        "output_rds=target_name,",
-        "eList=inputs_%s)"=task_name)
-    }
-  )
+  # forecast_loadest <- scipiper::create_task_step(
+  #   step_name = 'forecast_loadest',
+  #   target_name = function(task_name, step_name, ...) {
+  #     file.path(folders$tmp, sprintf('preds_loadest_%s.rds', task_name))
+  #   },
+  #   command = function(task_name, ...) {
+  #     psprintf(
+  #       "apply_loadest(",
+  #       "output_rds=target_name,",
+  #       "eList=inputs_%s)"=task_name)
+  #   }
+  # )
 
   forecast_wrtds <- scipiper::create_task_step(
     step_name = 'forecast_wrtds',
@@ -118,8 +118,8 @@ plan_forecasts <- function(
 
   task_plan <- scipiper::create_task_plan(
     task_names=tasks_df$task_name,
-    task_steps=list(subset, forecast_loadest, forecast_wrtds),
-    final_steps=c('forecast_loadest', 'forecast_wrtds'),
+    task_steps=list(subset, forecast_wrtds),
+    final_steps=c('forecast_wrtds'),
     add_complete=FALSE,
     ind_dir=folders$log)
 
