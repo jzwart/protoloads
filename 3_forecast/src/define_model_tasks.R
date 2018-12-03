@@ -4,6 +4,7 @@ list_tasks <- function(site_info_ind, dates_yml, nwm_med_ind, nwm_long1_ind, rem
   # read site/date selections and NWM forecasts
   sites <- readr::read_tsv(sc_retrieve(site_info_ind, remake_file = remake_file))$site_no
   dates <- yaml::yaml.load_file(dates_yml)
+  dates$forecast$end <- '2017-06-08' # cutting down on forecasts due to time crunch before AGU
   valid_dates <- seq(as.Date(dates$forecast$start), as.Date(dates$forecast$end), by=as.difftime(1, units='days'))
   nwm_med <- readRDS(sc_retrieve(nwm_med_ind, remake_file))
   nwm_long1 <- readRDS(sc_retrieve(nwm_long1_ind, remake_file))

@@ -73,17 +73,25 @@ targets:
       num_tries=I(1), sleep_on_error=I(0))
 
   # gather the data pulls
-  3_forecast/out/preds_loadest.rds.ind:
-    depends: 3_forecast/log/3_forecast_tasks.ind
-    command: gather_forecasts(
-      ind_file=target_name,
-      task_df=forecast_df,
-      task_plan=forecast_plan,
-      load_model=I('loadest'),
-      gd_config='lib/cfg/gd_config.yml')
+#  3_forecast/out/preds_loadest.rds.ind:
+#    depends: 3_forecast/log/3_forecast_tasks.ind
+#    command: gather_forecasts(
+#      ind_file=target_name,
+#      task_df=forecast_df,
+#      task_plan=forecast_plan,
+#      load_model=I('loadest'),
+#      gd_config='lib/cfg/gd_config.yml')
 
-  3_forecast/out/preds_wrtds.rds.ind:
-    depends: 3_forecast/log/3_forecast_tasks.ind
+#  3_forecast/out/preds_wrtds.rds.ind:
+#    depends: 3_forecast/log/3_forecast_tasks.ind
+#    command: gather_forecasts(
+#      ind_file=target_name,
+#      task_df=forecast_df,
+#      task_plan=forecast_plan,
+#      load_model=I('wrtds'),
+#      gd_config='lib/cfg/gd_config.yml')
+
+  3_forecast/out/preds_wrtds_agu.rds.ind:
     command: gather_forecasts(
       ind_file=target_name,
       task_df=forecast_df,

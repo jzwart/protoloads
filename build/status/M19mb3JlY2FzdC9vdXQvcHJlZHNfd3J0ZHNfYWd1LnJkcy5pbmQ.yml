@@ -1,0 +1,14 @@
+version: 0.3.0
+name: 3_forecast/out/preds_wrtds_agu.rds.ind
+type: file
+hash: 2e1e134d314effd38e452fe22ce41fbe
+time: 2018-12-03 17:36:10 UTC
+depends:
+  forecast_df: a8a1783a81bff7b6463231260373cc9a
+  forecast_plan: f45a2a37822a06a0ed7015c3520b3ae1
+  lib/cfg/gd_config.yml: cf9c52868594c233f17a6f751a553018
+fixed: 3ce443987ac232ae87cf2a06a4d82a76
+code:
+  functions:
+    gather_forecasts: 9d2e514d082a7529a9853e926ef084b8
+

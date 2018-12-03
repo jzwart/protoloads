@@ -5,7 +5,7 @@ apply_wrtds <- function(output_rds, eList) {
     nCores <- parallel::detectCores()-1
     cl <- makePSOCKcluster(nCores)
     registerDoParallel(cl)
-    fit_eList <- modelEstimation(eList, run.parallel=TRUE, verbose=FALSE)
+    fit_eList <- modelEstimation(eList, minNumObs = 1, run.parallel=TRUE, verbose=FALSE)
     stopCluster(cl)
 
     # Extract the load forecasts
