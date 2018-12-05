@@ -17,7 +17,7 @@ targets:
     depends:
       - 3_forecast/log/3_forecast_tasks.ind
       - 3_forecast/out/preds_loadest.rds.ind
-      - 3_forecast/out/preds_wrtds.rds.ind
+      - 3_forecast/out/preds_wrtds_agu.rds.ind
 
   # prepare destination folders for intermediate output.
   # out folder should already be created & git commited.

@@ -40,8 +40,8 @@ targets:
     command: gd_get('2_munge/out/agg_nwis.rds.ind', config_file='lib/cfg/gd_config.yml')
   3_forecast/out/preds_loadest.rds:
     command: gd_get('3_forecast/out/preds_loadest.rds.ind', config_file='lib/cfg/gd_config.yml')
-  3_forecast/out/preds_wrtds.rds:
-    command: gd_get('3_forecast/out/preds_wrtds.rds.ind', config_file='lib/cfg/gd_config.yml')
+  3_forecast/out/preds_wrtds_agu.rds:
+    command: gd_get('3_forecast/out/preds_wrtds_agu.rds.ind', config_file='lib/cfg/gd_config.yml')
 
   # Figures
   9_report/out/fig_preds_v_time_loadest.png.ind:
@@ -59,7 +59,7 @@ targets:
     command: fig_preds_v_time(
       fig_ind=target_name,
       config_fig_yml = '9_report/cfg/config_fig.yml',
-      preds_ind='3_forecast/out/preds_wrtds.rds.ind',
+      preds_ind='3_forecast/out/preds_wrtds_agu.rds.ind',
       agg_nwis_ind='2_munge/out/agg_nwis.rds.ind',
       remake_file=I('9_report.yml'),
       config_file='lib/cfg/gd_config.yml')
@@ -72,7 +72,7 @@ targets:
       config_fig_yml = '9_report/cfg/config_fig.yml',
       input_example_yml = '9_report/cfg/input_data_example.yml',
       nwis_data_ind='2_munge/out/agg_nwis.rds.ind',
-      preds_ind='3_forecast/out/preds_wrtds.rds.ind',
+      preds_ind='3_forecast/out/preds_wrtds_agu.rds.ind',
       remake_file=I('9_report.yml'),
       config_file='lib/cfg/gd_config.yml')
   9_report/out/fig_input_data.png:
@@ -82,7 +82,7 @@ targets:
     command: fig_error_v_leadtime(
       fig_ind=target_name,
       config_fig_yml = '9_report/cfg/config_fig.yml',
-      preds_ind='3_forecast/out/preds_wrtds.rds.ind',
+      preds_ind='3_forecast/out/preds_wrtds_agu.rds.ind',
       agg_nwis_ind='2_munge/out/agg_nwis.rds.ind',
       remake_file=I('9_report.yml'),
       config_file='lib/cfg/gd_config.yml')
@@ -93,7 +93,7 @@ targets:
     command: fig_error_v_flow(
       fig_ind=target_name,
       config_fig_yml = '9_report/cfg/config_fig.yml',
-      preds_ind='3_forecast/out/preds_wrtds.rds.ind',
+      preds_ind='3_forecast/out/preds_wrtds_agu.rds.ind',
       agg_nwis_ind='2_munge/out/agg_nwis.rds.ind',
       remake_file=I('9_report.yml'),
       config_file='lib/cfg/gd_config.yml')
@@ -105,7 +105,7 @@ targets:
       fig_ind=target_name,
       config_fig_yml = '9_report/cfg/config_fig.yml',
       loadest_preds_ind='3_forecast/out/preds_loadest.rds.ind',
-      wrtds_preds_ind = '3_forecast/out/preds_wrtds.rds.ind',
+      wrtds_preds_ind = '3_forecast/out/preds_wrtds_agu.rds.ind',
       agg_nwis_ind='2_munge/out/agg_nwis.rds.ind',
       remake_file=I('9_report.yml'),
       config_file='lib/cfg/gd_config.yml')
@@ -115,7 +115,7 @@ targets:
   exceedance:
     command: calc_exceedance(
       exceed_cfg_yml = '9_report/cfg/exceedance_threshold.yml',
-      preds_ind = '3_forecast/out/preds_wrtds.rds.ind',
+      preds_ind = '3_forecast/out/preds_wrtds_agu.rds.ind',
       agg_nwis_ind = '2_munge/out/agg_nwis.rds.ind',
       remake_file = I('9_report.yml'))
 
@@ -130,7 +130,7 @@ targets:
       config_fig_yml = '9_report/cfg/config_fig.yml',
       exceedance_df = exceedance,
       exceed_cfg_yml = '9_report/cfg/exceedance_threshold.yml',
-      preds_ind='3_forecast/out/preds_wrtds.rds.ind',
+      preds_ind='3_forecast/out/preds_wrtds_agu.rds.ind',
       agg_nwis_ind='2_munge/out/agg_nwis.rds.ind',
       remake_file=I('9_report.yml'),
       config_file='lib/cfg/gd_config.yml')

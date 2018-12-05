@@ -13,7 +13,7 @@ fig_error_v_leadtime <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_in
 
   # "truth"
   agg_nwis <- readRDS(sc_retrieve(agg_nwis_ind, remake_file))
-  agg_nwis$flux <- left_join(agg_nwis$nitrate_sensor, agg_nwis$flow, by=c('site_no','date'), suffix=c('_conc','_flow')) %>%
+  agg_nwis$flux <- left_join(agg_nwis$nitrate_grab, agg_nwis$flow, by=c('site_no','date'), suffix=c('_conc','_flow')) %>%
     mutate(daily_mean_flux = daily_mean_conc * daily_mean_flow * 60*60*24/1000) %>% # flow in kg/d
     rename(site=site_no)
 
@@ -112,8 +112,8 @@ fig_error_v_leadtime <- function(fig_ind, config_fig_yml, preds_ind, agg_nwis_in
   g$widths <- grid::unit.pmax(g1$widths, g2$widths, g3$widths)
   g$layout$clip[g$layout$name=='panel'] <- 'off' # so site labels don't get cut off
 
-  # windows()
-  # grid.draw(g)
+  windows()
+  grid.draw(g)
 
   # save and post to Drive
   fig_file <- as_data_file(fig_ind)
